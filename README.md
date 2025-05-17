@@ -21,10 +21,21 @@
 ### 🧰 Prerequisites
 
 - **CMake ≥ 3.14**
-- **Qt5 or Qt6** (`QtQuick`, `QtCore`, `LinguistTools`)
+- **Qt6** (`QtQuick`, `QtCore`, `LinguistTools`)
 - **C++17 compiler**
-
+- **PortAudio**
 ---
+
+```bash
+  qt6-base-dev
+  qt6-base-runtime
+  qt6-declarative-dev
+  qt6-l10n-tools
+  qt6-quickcontrols2-dev
+  qt6-multimedia-dev
+  libportaudio2
+  portaudio19-dev
+```
 
 ### 📥 Clone with Submodules
 
