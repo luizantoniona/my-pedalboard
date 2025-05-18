@@ -1,18 +1,16 @@
 # 🎸 My Pedalboard
 
 - **my-pedalboard** is a cross-platform Qt application designed to simulate a modular guitar pedalboard.
-- It uses [PortAudio](http://www.portaudio.com/) for low-latency audio input/output and a QML-based UI for fast prototyping and visual control.
+- It uses [PortAudio](http://www.portaudio.com/) for low-latency audio input/output and a QML-based UI for visual control.
 
 ---
 
 ## 📦 Features
 
-- 🎛 Modular GUI with QML controls
-- 🎚 Real-time audio I/O with PortAudio
+- 🎛 Modular GUI
+- 🎚 Real-time audio I/O
 - 🖥 Supports **Windows**, **Linux**, and **macOS**
-- 🧱 Qt5 and Qt6 compatible
-- 🧩 Clean code structure (Controllers, QML Controls, etc.)
-- 📡 Multilingual support with `.ts` translation files
+- 📡 Multilingual support
 
 ---
 
@@ -21,28 +19,19 @@
 ### 🧰 Prerequisites
 
 - **CMake ≥ 3.14**
-- **Qt6** (`QtQuick`, `QtCore`, `LinguistTools`)
-- **C++17 compiler**
+- **Qt6**
+- **C++**
 - **PortAudio**
 ---
 
 ```bash
-  qt6-base-dev
-  qt6-base-runtime
-  qt6-declarative-dev
-  qt6-l10n-tools
-  qt6-quickcontrols2-dev
-  qt6-multimedia-dev
-  libportaudio2
-  portaudio19-dev
-```
+sudo apt install -y qt6-base-dev qt6-base-dev-tools qt6-declarative-dev qt6-linguist qt6-linguist-tools
 
-### 📥 Clone with Submodules
+sudo apt install -y portaudio19-dev
 
-```bash
-git clone --recurse-submodules https://github.com/your-username/my-pedalboard.git
-cd my-pedalboard
-git submodule update --init --recursive
+sudo apt install -y cmake build-essential pkg-config
+
+sudo apt install -y libgl1-mesa-dev libx11-dev
 ```
 
 ### 🧱 Build Instructions
@@ -57,21 +46,11 @@ TODO
 
 ---
 
-
-
 ## 🧪 TODO
 
 - Add basic audio passthrough
 - Design QML-based pedal layout
 - Support pedal chaining and presets
-- Add VST or DSP module integration
-- Improve UI and add parameter controls
-
-
-## 📚 References
-
-- [Qt Documentation](https://doc.qt.io/)
-- [PortAudio](http://www.portaudio.com/)
 
 ---
 
