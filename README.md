@@ -18,14 +18,14 @@
 
 ### 🧰 Prerequisites
 
-- **CMake ≥ 3.14**
+- **CMake**
 - **Qt6**
 - **C++**
 - **PortAudio**
 ---
 
 ```bash
-sudo apt install -y qt6-base-dev qt6-base-dev-tools qt6-declarative-dev
+sudo apt install -y qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-declarative-dev qml6-module-*
 
 sudo apt install -y portaudio19-dev
 
