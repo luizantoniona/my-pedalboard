@@ -25,11 +25,9 @@
 ---
 
 ```bash
-sudo apt install -y qt6-base-dev qt6-base-dev-tools qt6-declarative-dev qt6-linguist qt6-linguist-tools
+sudo apt install -y qt6-base-dev qt6-base-dev-tools qt6-declarative-dev
 
 sudo apt install -y portaudio19-dev
-
-sudo apt install -y cmake build-essential pkg-config
 
 sudo apt install -y libgl1-mesa-dev libx11-dev
 ```
