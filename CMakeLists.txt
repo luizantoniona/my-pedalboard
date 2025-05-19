@@ -17,6 +17,10 @@ set(TS_FILES
     translations/my-pedalboard_en_US.ts
 )
 
+add_subdirectory(qml)
+add_subdirectory(qml/screen)
+add_subdirectory(qml/component)
+
 set(SOURCES
     main.cpp
     qml.qrc
