@@ -1,5 +1,5 @@
 import QtQuick 2.15
-import Component 1.0
+import Constant 1.0
 
 Item {
     id: root
@@ -10,6 +10,6 @@ Item {
     Rectangle {
         id: knobBackground
         anchors.fill: parent
-        color: color.background3
+        color: Colors.background3
     }
 }
