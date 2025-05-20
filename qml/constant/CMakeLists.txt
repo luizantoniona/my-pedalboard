@@ -1,8 +1,14 @@
-set(MODULE_NAME Screen)
+set(MODULE_NAME Constant)
 
 file(GLOB_RECURSE QML_FILES_LIST
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.qml"
+)
+
+set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Fonts.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 
 qt_add_qml_module(${MODULE_NAME}

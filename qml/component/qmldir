@@ -1,1 +1,3 @@
-module component
+module Component
+Knob 1.0 Knob.qml
+Pedal 1.0 Pedal.qml
