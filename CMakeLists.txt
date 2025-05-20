@@ -20,6 +20,7 @@ add_subdirectory(third_party/portaudio EXCLUDE_FROM_ALL)
 add_subdirectory(qml)
 add_subdirectory(qml/screen)
 add_subdirectory(qml/component)
+add_subdirectory(qml/constant)
 
 set(SOURCES
     main.cpp
@@ -28,26 +29,19 @@ set(SOURCES
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(my-pedalboard
-        MANUAL_FINALIZATION
-        ${SOURCES}
-    )
-
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 else()
-
-    add_executable(my-pedalboard
-      ${SOURCES}
-    )
-
+    add_executable(${PROJECT_NAME} ${SOURCES})
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
-target_link_libraries(my-pedalboard
+target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt${QT_VERSION_MAJOR}::Core
     PRIVATE Qt${QT_VERSION_MAJOR}::Quick
     PRIVATE Qt${QT_VERSION_MAJOR}::Gui
+    PRIVATE portaudio
 )
 
 set_target_properties(my-pedalboard PROPERTIES
