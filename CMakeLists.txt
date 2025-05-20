@@ -23,7 +23,6 @@ set(SOURCES
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     include(cmake/CMakeQt6.cmake)
-
 else()
     include(cmake/CMakeQt5.cmake)
 endif()
