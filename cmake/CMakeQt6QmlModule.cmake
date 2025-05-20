@@ -1,0 +1,14 @@
+message(STATUS "Configuring: ${MODULE_NAME} With: Qt6QML")
+
+qt_add_qml_module(
+    ${MODULE_NAME}
+    URI ${MODULE_NAME}
+    VERSION 1.0
+    QML_FILES ${QML_FILE_LIST}
+    RESOURCE_PREFIX /qml
+    OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}"
+)
+
+# install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/qml)
+# install(FILES qmldir DESTINATION ${CMAKE_INSTALL_PREFIX}/qml/${MODULE_NAME})
+configure_file(qmldir ${CMAKE_BINARY_DIR}/qml/${MODULE_NAME}/qmldir COPYONLY)

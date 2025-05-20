@@ -1,12 +1,12 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
-import Component 1.0
+import Components 1.0
 
 Window {
-    width: 800
     height: 640
-    visible: true
     title: qsTr("Hello World")
+    visible: true
+    width: 800
 
     Rectangle {
         id: testRectangle
@@ -15,6 +15,7 @@ Window {
 
         Knob {
             id: knobtest
+
             anchors.centerIn: parent
         }
     }

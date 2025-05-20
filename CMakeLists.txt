@@ -12,53 +12,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick LinguistTools)
 
-set(TS_FILES
-    translations/my-pedalboard_en_US.ts
-)
-
 add_subdirectory(third_party/portaudio EXCLUDE_FROM_ALL)
+add_subdirectory(translations)
 add_subdirectory(qml)
-add_subdirectory(qml/screen)
-add_subdirectory(qml/component)
-add_subdirectory(qml/constant)
 
 set(SOURCES
     main.cpp
-    qml.qrc
     ${TS_FILES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+    include(cmake/CMakeQt6.cmake)
 
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES})
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-endif()
-
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE Qt${QT_VERSION_MAJOR}::Core
-    PRIVATE Qt${QT_VERSION_MAJOR}::Quick
-    PRIVATE Qt${QT_VERSION_MAJOR}::Gui
-    PRIVATE portaudio
-)
-
-set_target_properties(my-pedalboard PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-)
-
-include(GNUInstallDirs)
-install(TARGETS my-pedalboard
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_import_qml_plugins(my-pedalboard)
-    qt_finalize_executable(my-pedalboard)
+    include(cmake/CMakeQt5.cmake)
 endif()

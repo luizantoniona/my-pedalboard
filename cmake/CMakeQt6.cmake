@@ -1,0 +1,27 @@
+message(STATUS "Using Qt6")
+
+qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
+qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE Qt6::Core
+    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Gui
+    PRIVATE portaudio
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME}
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+qt_import_qml_plugins(${PROJECT_NAME})
+qt_finalize_executable(${PROJECT_NAME})
