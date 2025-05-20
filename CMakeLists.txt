@@ -16,7 +16,7 @@ set(TS_FILES
     translations/my-pedalboard_en_US.ts
 )
 
-add_subdirectory(third_party/portaudio)
+add_subdirectory(third_party/portaudio EXCLUDE_FROM_ALL)
 add_subdirectory(qml)
 add_subdirectory(qml/screen)
 add_subdirectory(qml/component)
