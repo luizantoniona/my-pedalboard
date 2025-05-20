@@ -1,3 +1,3 @@
 set(TS_FILES
-    ${PROJECT_NAME}en_US.ts
+    ${PROJECT_NAME}_en_US.ts
 )
