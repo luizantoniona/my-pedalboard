@@ -24,15 +24,12 @@
 - **PortAudio**
 ---
 
-```bash
-sudo apt install -y qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-declarative-dev qml6-module-*
-
-sudo apt install -y portaudio19-dev
-
-sudo apt install -y libgl1-mesa-dev libx11-dev
-```
-
 ### 🧱 Build Instructions
+
+```bash
+git clone https://github.com/luizantoniona/my-pedalboard.git
+git submodule update --init --recursive
+```
 
 #### Linux/macOS
 
