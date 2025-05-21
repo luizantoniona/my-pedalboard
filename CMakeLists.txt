@@ -12,6 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick LinguistTools)
 
+list(APPEND QML_IMPORT_PATH ${CMAKE_SOURCE_DIR}/qml)
+set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Custom QML import paths" FORCE)
+
 add_subdirectory(third_party/portaudio EXCLUDE_FROM_ALL)
 add_subdirectory(translations)
 add_subdirectory(qml)

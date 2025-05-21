@@ -17,6 +17,7 @@ Window {
             id: knobtest
 
             anchors.centerIn: parent
+            vSize: 500
         }
     }
 }
