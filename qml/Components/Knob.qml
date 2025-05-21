@@ -3,6 +3,7 @@ import QtQuick 2.15
 KnobDesign {
     id: root
 
+    property real vIntensity: 0.5
     property string vLabel: "Vol"
     property color vLabelColor: "#FFFFFF"
 
@@ -11,5 +12,4 @@ KnobDesign {
     //        console.info("Pressionado:" + click);
     //    }
     property int vSize: 80
-    property real value: 0.75
 }

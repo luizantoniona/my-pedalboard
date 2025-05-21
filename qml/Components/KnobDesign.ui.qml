@@ -60,7 +60,7 @@ Item {
                             radiusX: (vSize - fillableShapePath.strokeWidth) / 2
                             radiusY: (vSize - fillableShapePath.strokeWidth) / 2
                             startAngle: 180
-                            sweepAngle: root.value * 180
+                            sweepAngle: vIntensity * 180
                         }
                     }
                 }
