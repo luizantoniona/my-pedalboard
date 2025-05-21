@@ -9,113 +9,70 @@ Item {
     height: vSize
     width: vSize
 
-    ColumnLayout {
-        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+    Rectangle {
         anchors.fill: parent
-        spacing: 6
+        color: "#ffd0e2"
 
-        // Knob Area
-        Item {
-            id: knobArea
+        ColumnLayout {
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            anchors.fill: parent
 
-            height: vSize
-            width: vSize
+            Item {
+                id: knobArea
 
-            // Background ring (dark gray)
-            Shape {
-                anchors.centerIn: parent
-                height: parent.height
-                width: parent.width
+                height: vSize
+                width: vSize
 
-                ShapePath {
-                    capStyle: ShapePath.RoundCap
-                    fillColor: "transparent"
-                    strokeColor: "#2e3b40"
-                    strokeWidth: 6
-
-                    PathArc {
-                        radiusX: width / 2
-                        radiusY: height / 2
-                        useLargeArc: true
-                        x: width
-                        y: height
-                    }
-                }
-
-                ShapePath {
-                    capStyle: ShapePath.RoundCap
-                    fillColor: "transparent"
-                    strokeColor: "#ff9933"
-                    // Orange arc (value indicator)
-                    strokeWidth: 6
-
-                    PathArc {
-                        radiusX: width / 2
-                        radiusY: height / 2
-                        useLargeArc: false
-                        x: width
-                        y: height
-                    }
-                }
-            }
-
-            // Main knob face
-            Rectangle {
-                id: knobFace
-
-                anchors.centerIn: parent
-                color: "#3c454a"
-                height: width
-                radius: width / 2
-                width: parent.width * 0.8
-
-                // Glossy effect (optional)
-                Rectangle {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    height: parent.height * 0.5
-                    opacity: 0.3
-                    radius: parent.radius
+                Shape {
+                    anchors.centerIn: parent
+                    height: parent.height
                     width: parent.width
 
-                    gradient: Gradient {
-                        GradientStop {
-                            color: "#5a666b"
-                            position: 0.0
-                        }
+                    ShapePath {
+                        id: fillableShapePath
 
-                        GradientStop {
-                            color: "transparent"
-                            position: 1.0
+                        capStyle: ShapePath.RoundCap
+                        fillColor: "transparent"
+                        strokeColor: "#2e3b40"
+                        strokeWidth: vSize / 8
+
+                        PathAngleArc {
+                            centerX: vSize / 2
+                            centerY: vSize / 2
+                            radiusX: (vSize - fillableShapePath.strokeWidth) / 2
+                            radiusY: (vSize - fillableShapePath.strokeWidth) / 2
+                            startAngle: 180
+                            sweepAngle: 180
+                        }
+                    }
+
+                    ShapePath {
+                        id: valueShapePath
+
+                        capStyle: ShapePath.RoundCap
+                        fillColor: "transparent"
+                        strokeColor: "#ff9933"
+                        strokeWidth: vSize / 16
+
+                        PathAngleArc {
+                            centerX: vSize / 2
+                            centerY: vSize / 2
+                            radiusX: (vSize - fillableShapePath.strokeWidth) / 2
+                            radiusY: (vSize - fillableShapePath.strokeWidth) / 2
+                            startAngle: 180
+                            sweepAngle: root.value * 180
                         }
                     }
                 }
             }
 
-            // Pointer (orange vertical line)
-            Rectangle {
-                anchors.horizontalCenter: knobFace.horizontalCenter
-                anchors.verticalCenter: knobFace.verticalCenter
-                color: "#ff9933"
-                height: knobFace.height / 2.2
-                radius: 2
-                width: 4
-
-                transform: Rotation {
-                    angle: 0 // placeholder for value rotation
-                    origin.x: 2
-                    origin.y: knobFace.height / 2.2
-                }
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                color: vLabelColor
+                font.pixelSize: 14
+                horizontalAlignment: Text.AlignHCenter
+                text: vLabel
             }
-        }
-
-        // Label
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            color: vLabelColor
-            font.pixelSize: 14
-            horizontalAlignment: Text.AlignHCenter
-            text: vLabel
         }
     }
 }
