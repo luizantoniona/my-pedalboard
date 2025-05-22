@@ -8,6 +8,9 @@ Item {
     height: vSize
     width: vSize
 
+    property alias outsidePath: outsidePath
+    property alias insidePath: insidePath
+
     Shape {
         anchors.centerIn: parent
         height: parent.height
@@ -19,7 +22,7 @@ Item {
             capStyle: ShapePath.RoundCap
             fillColor: Colors.backgroundT
             strokeColor: vOutlineColor
-            strokeWidth: vSize / 8
+            strokeWidth: vSize / 16
 
             PathAngleArc {
                 centerX: vSize / 2
@@ -37,7 +40,7 @@ Item {
             capStyle: ShapePath.RoundCap
             fillColor: Colors.backgroundT
             strokeColor: vFillColor
-            strokeWidth: vSize / 16
+            strokeWidth: vSize / 24
 
             PathAngleArc {
                 centerX: vSize / 2
