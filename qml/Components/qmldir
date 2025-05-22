@@ -1,4 +1,4 @@
 module Components
-Knob 1.0 Knob.qml
+BasicKnob 1.0 Knobs/BasicKnob.qml
 ArcMeter 1.0 Meters/ArcMeter.qml
 Pedal 1.0 Pedal.qml

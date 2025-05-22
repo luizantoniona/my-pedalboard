@@ -13,7 +13,7 @@ Window {
 
         anchors.fill: parent
 
-        Knob {
+        BasicKnob {
             id: knobtest
 
             anchors.centerIn: parent
