@@ -1,11 +1,16 @@
 #include <QGuiApplication>
 #include <QLocale>
 #include <QQmlApplicationEngine>
+#include <QSurfaceFormat>
 #include <QTranslator>
 
 int main( int argc, char* argv[] ) {
 
     QGuiApplication app( argc, argv );
+
+    QSurfaceFormat format;
+    format.setSamples( 8 );
+    QSurfaceFormat::setDefaultFormat( format );
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -30,10 +35,10 @@ int main( int argc, char* argv[] ) {
         &QQmlApplicationEngine::objectCreated,
         &app,
         [ url ]( const QObject* obj, const QUrl& objUrl ) {
-        if ( !obj && url == objUrl ) {
-            QCoreApplication::exit( -1 );
-        }
-    },
+            if ( !obj && url == objUrl ) {
+                QCoreApplication::exit( -1 );
+            }
+        },
         Qt::QueuedConnection );
     engine.load( url );
 
