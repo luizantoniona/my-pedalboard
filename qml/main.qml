@@ -4,7 +4,7 @@ import Components 1.0
 
 Window {
     height: 640
-    title: qsTr("Hello World")
+    title: qsTr("My Pedalboard")
     visible: true
     width: 800
 
