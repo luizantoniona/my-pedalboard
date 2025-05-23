@@ -15,10 +15,12 @@ Item {
         radius: vSize / 2
     }
 
+    //TODO Adjust the needle format
+
     Rectangle {
         id: needle
         width: 2
-        height: vSize / 2.2
+        height: vSize / 2
         radius: 1
         color: vNeedleColor
 
@@ -30,5 +32,8 @@ Item {
     MouseArea {
         id: knobArea
         anchors.fill: parent
+
+        property bool dragging: false
+        property real lastAngle: 0
     }
 }

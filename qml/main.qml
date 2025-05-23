@@ -8,16 +8,16 @@ Window {
     visible: true
     width: 800
 
-    Rectangle {
-        id: testRectangle
+    Row {
 
         anchors.fill: parent
 
         MeterKnob {
-            id: knobtest
+            vSize: 250
+        }
 
-            anchors.centerIn: parent
-            vSize: 500
+        BasicKnob {
+            vSize: 250
         }
     }
 }

@@ -12,15 +12,50 @@ BasicKnobDesign {
     readonly property real vAngle: vStartAngle + (vMaxAngle * vIntensityInternal)
     property int vStartAngle: 225
     property int vMaxAngle: 270
+    property double vSensitivity: 1.0
+
+    function angleFromCenter(x, y) {
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const dx = x - centerX;
+        const dy = centerY - y;
+        let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        if (angle < 0)
+            angle += 360;
+        return angle;
+    }
 
     onVIntensityChanged: {
         vIntensityInternal = Math.max(0.0, Math.min(1.0, vIntensity));
     }
 
+    knobArea.onPressed: event => {
+        knobArea.dragging = true;
+        knobArea.lastAngle = angleFromCenter(event.x, event.y);
+    }
+
+    knobArea.onPositionChanged: event => {
+        if (!knobArea.dragging)
+            return;
+
+        const currentAngle = angleFromCenter(event.x, event.y);
+        let delta = currentAngle - knobArea.lastAngle;
+
+        if (delta > 180) {
+            delta -= 360;
+        }
+
+        if (delta < -180) {
+            delta += 360;
+        }
+
+        const sensitivity = vSensitivity / vMaxAngle;
+        vIntensity = Math.max(0.0, Math.min(1.0, vIntensity - delta * sensitivity));
+        knobArea.lastAngle = currentAngle;
+    }
+
     knobArea.onReleased: {
-        //TODO - Add a function to set the value correctly and send signal
-        console.info("Released");
-        vIntensity = vIntensity + 0.1;
+        knobArea.dragging = false;
     }
 
     transform: Rotation {
@@ -32,7 +67,7 @@ BasicKnobDesign {
 
     Behavior on vIntensity {
         NumberAnimation {
-            duration: 200
+            duration: 100
             easing.type: Easing.InOutQuad
         }
     }
