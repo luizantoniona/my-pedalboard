@@ -5,11 +5,11 @@ import Colors 1.0
 Item {
     id: root
 
+    property alias insidePath: insidePath
+    property alias outsidePath: outsidePath
+
     height: vSize
     width: vSize
-
-    property alias outsidePath: outsidePath
-    property alias insidePath: insidePath
 
     Shape {
         anchors.centerIn: parent

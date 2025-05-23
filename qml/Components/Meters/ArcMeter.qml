@@ -4,22 +4,22 @@ import Colors 1.0
 ArcMeterDesign {
     id: root
 
-    property real vIntensityInternal: 0.0
-    property real vIntensity: 0.0
-    property int vSize: 80
     property color vFillColor: Colors.accent
-    property color vOutlineColor: Colors.background0
-    property int vStartAngle: 135
+    property real vIntensity: 0.0
+    property real vIntensityInternal: 0.0
     property int vMaxAngle: 270
+    property color vOutlineColor: Colors.background0
+    property int vSize: 80
+    property int vStartAngle: 135
 
-    onVIntensityChanged: {
-        vIntensityInternal = Math.max(0.0, Math.min(1.0, vIntensity));
-    }
-
-    Behavior on vIntensity {
+    Behavior on vIntensity  {
         NumberAnimation {
             duration: 100
             easing.type: Easing.InOutQuad
         }
+    }
+
+    onVIntensityChanged: {
+        vIntensityInternal = Math.max(0.0, Math.min(1.0, vIntensity));
     }
 }

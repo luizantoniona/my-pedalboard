@@ -9,7 +9,6 @@ Window {
     width: 800
 
     Row {
-
         anchors.fill: parent
 
         MeterKnob {

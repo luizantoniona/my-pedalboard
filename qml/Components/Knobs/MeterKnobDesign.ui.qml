@@ -10,9 +10,9 @@ Item {
     ArcMeter {
         id: knobArc
 
-        vSize: root.vSize
-        vIntensity: knob.vIntensity
         anchors.centerIn: parent
+        vIntensity: knob.vIntensity
+        vSize: root.vSize
     }
 
     BasicKnob {
