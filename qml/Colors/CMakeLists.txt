@@ -11,4 +11,4 @@ set_source_files_properties(
 )
 
 
-include(${CMAKE_SOURCE_DIR}/cmake/CMakeQt6QmlModule.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/CMakeQMLModuleConfiguration.cmake)

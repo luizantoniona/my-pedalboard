@@ -5,4 +5,4 @@ file(GLOB_RECURSE QML_FILE_LIST
     CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.qml"
 )
 
-include(${CMAKE_SOURCE_DIR}/cmake/CMakeQt6QmlModule.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/CMakeQMLModuleConfiguration.cmake)
