@@ -32,6 +32,15 @@ float* AudioManager::getCurrentBuffer() {
     return currentSource ? currentSource->getBuffer() : nullptr;
 }
 
+void AudioManager::addEffect( std::shared_ptr<Effect> effect ) {
+    effects.push_back( effect );
+}
+
+void AudioManager::processEffects( float* buffer, size_t frames ) {
+    for ( auto& effect : effects )
+        effect->process( buffer, frames );
+}
+
 void AudioManager::setFilePath( const QString& path ) {
     filePath = path;
 }
