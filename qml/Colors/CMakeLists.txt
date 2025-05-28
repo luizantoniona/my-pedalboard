@@ -10,5 +10,4 @@ set_source_files_properties(
     PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 
-
 include(${CMAKE_SOURCE_DIR}/cmake/CMakeQMLModuleConfiguration.cmake)
