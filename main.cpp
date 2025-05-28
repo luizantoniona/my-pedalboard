@@ -26,21 +26,11 @@ int main( int argc, char* argv[] ) {
 
     QQmlApplicationEngine engine;
 
-    engine.addImportPath( QCoreApplication::applicationDirPath() + "/qml" );
+    engine.loadFromModule( "main", "main" );
 
-    const QUrl url( QUrl::fromLocalFile( QCoreApplication::applicationDirPath() + "/qml/main.qml" ) );
-
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreated,
-        &app,
-        [ url ]( const QObject* obj, const QUrl& objUrl ) {
-            if ( !obj && url == objUrl ) {
-                QCoreApplication::exit( -1 );
-            }
-        },
-        Qt::QueuedConnection );
-    engine.load( url );
+    if ( engine.rootObjects().isEmpty() ) {
+        return -1;
+    }
 
     return app.exec();
 }

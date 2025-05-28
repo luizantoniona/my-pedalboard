@@ -5,8 +5,4 @@ file(GLOB_RECURSE QML_FILE_LIST
     CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.qml"
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    include(${CMAKE_SOURCE_DIR}/cmake/CMakeQt6QmlModule.cmake)
-else()
-    include(${CMAKE_SOURCE_DIR}/cmake/CMakeQt5QmlModule.cmake)
-endif()
+include(${CMAKE_SOURCE_DIR}/cmake/CMakeQMLModuleConfiguration.cmake)
