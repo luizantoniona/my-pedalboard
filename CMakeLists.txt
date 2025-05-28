@@ -13,6 +13,7 @@ qt_policy(SET QTP0001 NEW)
 add_subdirectory(third_party/portaudio EXCLUDE_FROM_ALL)
 add_subdirectory(translations)
 add_subdirectory(qml)
+add_subdirectory(core)
 
 set(SOURCES
     main.cpp
