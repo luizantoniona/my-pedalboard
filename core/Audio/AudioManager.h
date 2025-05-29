@@ -27,6 +27,6 @@ public:
 
 private:
     std::unique_ptr<AudioSource> currentSource;
-    std::vector<std::shared_ptr<Effect>> effects;
+    std::vector<std::shared_ptr<Effect> > effects;
     QString filePath;
 };
