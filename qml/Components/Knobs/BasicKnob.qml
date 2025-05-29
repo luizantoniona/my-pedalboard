@@ -1,5 +1,5 @@
 import QtQuick 2.15
-import Colors 1.0
+import Constants 1.0
 
 BasicKnobDesign {
     id: root

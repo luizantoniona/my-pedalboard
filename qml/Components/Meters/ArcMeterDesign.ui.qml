@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Shapes 1.15
-import Colors 1.0
+import Constants 1.0
 
 Item {
     id: root

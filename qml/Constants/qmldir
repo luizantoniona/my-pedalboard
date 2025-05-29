@@ -1,0 +1,3 @@
+module Constants
+singleton Colors 1.0 Colors/Colors.qml
+singleton Fonts 1.0 Fonts/Fonts.qml

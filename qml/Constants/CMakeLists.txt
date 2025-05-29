@@ -1,10 +1,16 @@
-set(MODULE_NAME Components)
+set(MODULE_NAME Constants)
 message(STATUS "Configuring: ${MODULE_NAME}")
 
 file(GLOB_RECURSE QML_FILE_LIST
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.qml"
+)
+
+set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Colors/Colors.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Fonts/Fonts.qml
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 
 qt_add_qml_module(

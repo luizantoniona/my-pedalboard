@@ -25,8 +25,8 @@ int main( int argc, char* argv[] ) {
     }
 
     QQmlApplicationEngine engine;
-
-    engine.loadFromModule( "main", "main" );
+    engine.addImportPath( QCoreApplication::applicationDirPath() + "/qml" );
+    engine.loadFromModule( "Main", "Main" );
 
     if ( engine.rootObjects().isEmpty() ) {
         return -1;
