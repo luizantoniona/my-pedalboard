@@ -1,6 +1,6 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import Components 1.0
+import QtQuick
+import QtQuick.Window
+import Components
 
 Window {
     height: 640

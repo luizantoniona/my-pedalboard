@@ -1,5 +1,4 @@
-import QtQuick 2.15
-import Constants 1.0
+import QtQuick
 
 ArcMeterDesign {
     id: root
