@@ -8,21 +8,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick LinguistTools)
 
-qt_policy(SET QTP0001 NEW)
+# qt_policy(SET QTP0001 NEW) #For Qt 6.5
 
-add_subdirectory(third_party/portaudio EXCLUDE_FROM_ALL)
 add_subdirectory(translations)
 add_subdirectory(qml)
 add_subdirectory(core)
 
 set(SOURCES
     main.cpp
-    ${TS_FILES}
 )
 
 qt_add_executable(${PROJECT_NAME} ${SOURCES})
-
-qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Core
