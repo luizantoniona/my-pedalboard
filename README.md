@@ -1,7 +1,6 @@
 # 🎸 My Pedalboard
 
 - **my-pedalboard** is a cross-platform Qt application designed to simulate a modular guitar pedalboard.
-- It uses [PortAudio](http://www.portaudio.com/) for low-latency audio input/output and a QML-based UI for visual control.
 
 ---
 
@@ -21,14 +20,12 @@
 - **CMake**
 - **Qt6**
 - **C++**
-- **PortAudio**
 ---
 
 ### 🧱 Build Instructions
 
 ```bash
 git clone https://github.com/luizantoniona/my-pedalboard.git
-git submodule update --init --recursive
 ```
 
 #### Linux/macOS

@@ -29,7 +29,6 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Gui
     PRIVATE Qt6::Qml
     PRIVATE Qt6::Quick
-    PRIVATE portaudio
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

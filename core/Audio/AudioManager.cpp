@@ -11,9 +11,7 @@ void AudioManager::selectSource( AudioSourceType type ) {
         currentSource = std::make_unique<AudioSourceLiveInput>();
         break;
     case AudioSourceType::FileInput:
-        auto fileSource = std::make_unique<AudioSourceFileInput>();
-        fileSource->setFilePath( filePath );
-        currentSource = std::move( fileSource );
+        currentSource = std::make_unique<AudioSourceFileInput>();
         break;
     }
 }
@@ -39,8 +37,4 @@ void AudioManager::addEffect( std::shared_ptr<Effect> effect ) {
 void AudioManager::processEffects( float* buffer, size_t frames ) {
     for ( auto& effect : effects )
         effect->process( buffer, frames );
-}
-
-void AudioManager::setFilePath( const QString& path ) {
-    filePath = path;
 }

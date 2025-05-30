@@ -23,10 +23,7 @@ public:
 
     void processEffects( float* buffer, size_t frames );
 
-    void setFilePath( const QString& path );
-
 private:
     std::unique_ptr<AudioSource> currentSource;
     std::vector<std::shared_ptr<Effect> > effects;
-    QString filePath;
 };

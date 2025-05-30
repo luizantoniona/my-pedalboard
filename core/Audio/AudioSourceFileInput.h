@@ -7,6 +7,7 @@
 class AudioSourceFileInput : public AudioSource {
 public:
     AudioSourceFileInput();
+    ~AudioSourceFileInput();
 
     void start() override;
 
@@ -14,11 +15,5 @@ public:
 
     float* getBuffer() override;
 
-    void setFilePath( const QString& path );
-
 private:
-    float* buffer = nullptr;
-    size_t totalFrames = 0;
-    size_t currentFrame = 0;
-    QString filePath;
 };

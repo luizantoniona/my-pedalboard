@@ -1,5 +1,8 @@
 set(TS_FILES
-    translations/${PROJECT_NAME}_en_US.ts
-    translations/${PROJECT_NAME}_pt_BR.ts
-    PARENT_SCOPE
+    ${PROJECT_NAME}_en_US.ts
+    ${PROJECT_NAME}_pt_BR.ts
 )
+
+qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+
+add_custom_target(translations ALL SOURCES ${TS_FILES})

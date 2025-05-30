@@ -5,12 +5,7 @@
 AudioSourceFileInput::AudioSourceFileInput() {
 }
 
-void AudioSourceFileInput::setFilePath( const QString& path ) {
-    filePath = path;
-}
-
 void AudioSourceFileInput::start() {
-    stop();
 
     // TODO: Implementar leitura de arquivo de áudio
 }
@@ -21,5 +16,6 @@ void AudioSourceFileInput::stop() {
 }
 
 float* AudioSourceFileInput::getBuffer() {
-    return buffer;
+
+    // TODO: Buffer
 }
