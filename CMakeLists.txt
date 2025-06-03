@@ -10,6 +10,7 @@ find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 qt_standard_project_setup(REQUIRES 6.8)
 
 add_subdirectory(assets)
+add_subdirectory(qml)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
@@ -37,6 +38,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Quick
+    PRIVATE ${QML_MODULES}
 )
 
 include(GNUInstallDirs)
