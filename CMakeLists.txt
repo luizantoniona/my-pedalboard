@@ -9,6 +9,8 @@ find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
+add_subdirectory(assets)
+
 qt_add_executable(${PROJECT_NAME}
     main.cpp
 )
@@ -43,8 +45,3 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-# add_subdirectory(qml/Components)
-# add_subdirectory(qml/Constants)
-# add_subdirectory(core)
-add_subdirectory(qml/Components)
