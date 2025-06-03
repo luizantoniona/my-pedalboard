@@ -1,22 +1,51 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Window
-import Components
 
+// import Organisms
+// import Pages
 Window {
-    height: 640
-    title: qsTr("My Pedalboard")
     visible: true
-    width: 800
+    width: 1280
+    height: 720
+    title: "My Pedalboard"
 
-    Row {
+    property int currentPage: 0
+
+    enum Pages {
+        Home,
+        Settings,
+        About
+    }
+
+    // function updatePage(page) {
+    //     stack.clear()
+    //     switch (page) {
+    //     case Pages.Home:
+    //         stack.push(Qt.createComponent("qrc:/qt/qml/Pages/HomePage.qml"))
+    //         break
+    //     case Pages.Settings:
+    //         stack.push(Qt.createComponent("qrc:/qt/qml/Pages/SettingsPage.qml"))
+    //         break
+    //     case Pages.About:
+    //         stack.push(Qt.createComponent("qrc:/qt/qml/Pages/AboutPage.qml"))
+    //         break
+    //     }
+    // }
+    ColumnLayout {
         anchors.fill: parent
 
-        MeterKnob {
-            vSize: 250
-        }
+        // TopBar {
+        //     Layout.fillWidth: true
+        //     onNavigate: page => currentPage = page
+        // }
+        StackView {
+            id: stack
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        BasicKnob {
-            vSize: 250
+            // initialItem: HomePage {}
         }
     }
 }
