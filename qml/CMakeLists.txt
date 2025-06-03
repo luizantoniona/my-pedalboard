@@ -1,4 +1,4 @@
-# set(MODULE_NAME qml)
+set(MODULE_NAME qml)
 
 # file(GLOB QML_FILES_LIST
 #     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -6,12 +6,12 @@
 #     "*.qml"
 # )
 
-# qt_add_qml_module(${MODULE_NAME}
-#     URI ${MODULE_NAME}
-#     VERSION 1.0
-#     QML_FILES
-#         ${QML_FILES_LIST}
-# )
+qt_add_qml_module(${MODULE_NAME}
+    URI ${MODULE_NAME}
+    VERSION 1.0
+    QML_FILES
+        ${QML_FILES_LIST}
+)
 
 add_subdirectory(Atoms)
 add_subdirectory(Molecules)

@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import Organisms
 
-// import Organisms
 // import Pages
 Window {
     visible: true
@@ -36,10 +36,18 @@ Window {
     ColumnLayout {
         anchors.fill: parent
 
-        // TopBar {
-        //     Layout.fillWidth: true
-        //     onNavigate: page => currentPage = page
-        // }
+        TopBar {
+            id: topBar
+            Layout.fillWidth: true
+            onNavigate: page => currentPage = page
+        }
+
+        Image {
+            source: "qrc:/icons/outlined/home.svg"
+            width: 64
+            height: 64
+        }
+
         StackView {
             id: stack
             Layout.fillWidth: true

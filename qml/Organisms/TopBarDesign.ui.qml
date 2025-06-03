@@ -5,24 +5,22 @@ import Atoms
 Item {
     id: root
 
-    signal navigate(int page)
-
     Row {
         spacing: 12
 
         ButtonIcon {
-            iconName: "home"
-            onClicked: root.navigate(0)
+            id: buttonHome
+            vIconName: "home"
         }
 
         ButtonIcon {
-            iconName: "settings"
-            onClicked: root.navigate(1)
+            id: buttonSettings
+            vIconName: "settings"
         }
 
         ButtonIcon {
-            iconName: "info-circle"
-            onClicked: root.navigate(2)
+            id: buttonInfo
+            vIconName: "info-circle"
         }
     }
 }
