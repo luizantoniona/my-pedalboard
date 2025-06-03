@@ -10,16 +10,13 @@ find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 qt_standard_project_setup(REQUIRES 6.8)
 
 add_subdirectory(assets)
+add_subdirectory(translations)
 add_subdirectory(qml)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
-)
-
-qt_add_translations(${PROJECT_NAME}
-    TS_FILES
-    translations/${PROJECT_NAME}_pt_BR.ts
-    translations/${PROJECT_NAME}_en_US.ts
+    ${SOURCES}
+    ${HEADERS}
 )
 
 qt_add_qml_module(${PROJECT_NAME}
