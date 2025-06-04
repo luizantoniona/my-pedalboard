@@ -48,6 +48,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Quick
     PRIVATE ${QML_MODULES}
+    PRIVATE audio
 )
 
 include(GNUInstallDirs)
