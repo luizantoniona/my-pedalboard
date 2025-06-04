@@ -16,8 +16,6 @@ add_subdirectory(core)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
-    ${SOURCES}
-    ${HEADERS}
 )
 
 qt_add_qml_module(${PROJECT_NAME}
