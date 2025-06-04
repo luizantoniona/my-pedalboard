@@ -16,8 +16,6 @@ int main( int argc, char* argv[] ) {
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for ( const QString& locale : uiLanguages ) {
         const QString baseName = "my-pedalboard_" + QLocale( locale ).name();
-
-        qInfo() << "Installing translation for:" << baseName;
         if ( translator.load( ":/translations/" + baseName ) ) {
             app.installTranslator( &translator );
             break;
@@ -25,12 +23,13 @@ int main( int argc, char* argv[] ) {
     }
 
     QQmlApplicationEngine engine;
+    QObject::connect(
+        &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
+        []() { QCoreApplication::exit( -1 ); },
 
-    engine.loadFromModule( "main", "main" );
+        Qt::QueuedConnection );
 
-    if ( engine.rootObjects().isEmpty() ) {
-        return -1;
-    }
+    engine.loadFromModule( "main", "Main" );
 
     return app.exec();
 }

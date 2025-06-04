@@ -1,0 +1,24 @@
+set(MODULE_NAME Atoms)
+
+file(GLOB QML_FILES_LIST
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    CONFIGURE_DEPENDS
+    "*.qml"
+)
+
+# set_source_files_properties(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
+#     ${CMAKE_CURRENT_SOURCE_DIR}/ColorsDark.qml
+#     ${CMAKE_CURRENT_SOURCE_DIR}/ColorsLight.qml
+#     PROPERTIES QT_QML_SINGLETON_TYPE TRUE
+# )
+
+qt_add_qml_module(${MODULE_NAME}
+    URI ${MODULE_NAME}
+    VERSION 1.0
+    OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${MODULE_NAME}"
+    QML_FILES
+        ${QML_FILES_LIST}
+)
+
+set(QML_MODULES ${QML_MODULES} ${MODULE_NAME} PARENT_SCOPE)

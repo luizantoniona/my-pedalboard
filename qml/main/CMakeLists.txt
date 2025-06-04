@@ -1,8 +1,0 @@
-set(MODULE_NAME main)
-
-file(GLOB_RECURSE QML_FILE_LIST
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
-    CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/main.qml"
-)
-
-include(${CMAKE_SOURCE_DIR}/cmake/CMakeQMLModuleConfiguration.cmake)

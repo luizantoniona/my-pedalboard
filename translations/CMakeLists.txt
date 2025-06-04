@@ -1,5 +1,9 @@
-set(TS_FILES
-    translations/${PROJECT_NAME}_en_US.ts
-    translations/${PROJECT_NAME}_pt_BR.ts
-    PARENT_SCOPE
+set(TRANSLATION_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_en_US.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_pt_BR.ts
+)
+
+qt_add_translations(${PROJECT_NAME}
+    TS_FILES
+    ${TRANSLATION_FILES}
 )
