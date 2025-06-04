@@ -5,8 +5,11 @@ import Atoms
 Item {
     id: root
 
+    property alias buttonHome: buttonHome
+    property alias buttonSettings: buttonSettings
+    property alias buttonInfo: buttonInfo
+
     Row {
-        spacing: 12
 
         ButtonIcon {
             id: buttonHome

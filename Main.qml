@@ -3,8 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
 import Organisms
+import Pages
 
-// import Pages
 Window {
     visible: true
     width: 1280
@@ -13,39 +13,30 @@ Window {
 
     property int currentPage: 0
 
-    enum Pages {
+    enum PageEnum {
         Home,
-        Settings,
-        About
+        Settings
     }
 
-    // function updatePage(page) {
-    //     stack.clear()
-    //     switch (page) {
-    //     case Pages.Home:
-    //         stack.push(Qt.createComponent("qrc:/qt/qml/Pages/HomePage.qml"))
-    //         break
-    //     case Pages.Settings:
-    //         stack.push(Qt.createComponent("qrc:/qt/qml/Pages/SettingsPage.qml"))
-    //         break
-    //     case Pages.About:
-    //         stack.push(Qt.createComponent("qrc:/qt/qml/Pages/AboutPage.qml"))
-    //         break
-    //     }
-    // }
+    function updatePage(page) {
+        stack.clear()
+        switch (page) {
+        case Main.PageEnum.Home:
+            stack.push(pageHome)
+            break
+        case Main.PageEnum.Settings:
+            stack.push(pageSettings)
+            break
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
 
         TopBar {
             id: topBar
             Layout.fillWidth: true
-            onNavigate: page => currentPage = page
-        }
-
-        Image {
-            source: "qrc:/icons/outlined/home.svg"
-            width: 64
-            height: 64
+            onNavigate: updatePage(page)
         }
 
         StackView {
@@ -53,7 +44,19 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            // initialItem: HomePage {}
+            initialItem: pageHome
         }
+    }
+
+    Component {
+        id: pageHome
+
+        PageHome {}
+    }
+
+    Component {
+        id: pageSettings
+
+        PageSettings {}
     }
 }
