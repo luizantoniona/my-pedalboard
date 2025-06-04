@@ -4,12 +4,12 @@ project(my-pedalboard VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-add_subdirectory(assets)
 add_subdirectory(translations)
 add_subdirectory(qml)
 
@@ -22,8 +22,19 @@ qt_add_executable(${PROJECT_NAME}
 qt_add_qml_module(${PROJECT_NAME}
     URI main
     VERSION 1.0
-    QML_FILES
-        Main.qml
+    QML_FILES Main.qml
+)
+
+file(GLOB_RECURSE SVG_FILES
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    assets/*.svg
+)
+
+qt_add_resources(${PROJECT_NAME}
+    PREFIX "/assets"
+    BASE "assets"
+    FILES
+        ${SVG_FILES}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

@@ -7,5 +7,5 @@ Button {
     width: 40
     height: 40
     icon.source: "qrc:/icons/outlined/" + vIconName + ".svg"
-    icon.color: "black"
+    icon.color: "blue"
 }
