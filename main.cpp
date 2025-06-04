@@ -4,6 +4,8 @@
 #include <QSurfaceFormat>
 #include <QTranslator>
 
+#include <core/registertypes.h>
+
 int main( int argc, char* argv[] ) {
 
     QGuiApplication app( argc, argv );
@@ -23,6 +25,9 @@ int main( int argc, char* argv[] ) {
     }
 
     QQmlApplicationEngine engine;
+
+    RegisterTypes::registerTypes();
+
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
         []() { QCoreApplication::exit( -1 ); },
