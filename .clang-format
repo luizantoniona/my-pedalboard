@@ -3,7 +3,10 @@ Language: Cpp
 BasedOnStyle: LLVM
 AccessModifierOffset: -4
 AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Attach
+BreakBeforeConceptDeclarations: Never
 BreakConstructorInitializers: AfterColon
+BreakTemplateDeclarations: No
 ColumnLimit: 0
 DerivePointerAlignment: false
 EmptyLineBeforeAccessModifier: Always
