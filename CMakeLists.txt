@@ -10,14 +10,13 @@ find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-add_subdirectory(translations)
-add_subdirectory(qml)
-add_subdirectory(core)
+add_subdirectory(Translations)
+add_subdirectory(QML)
+add_subdirectory(Control)
+add_subdirectory(Core)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
-    ${SOURCES}
-    ${HEADERS}
 )
 
 qt_add_qml_module(${PROJECT_NAME}
@@ -28,14 +27,13 @@ qt_add_qml_module(${PROJECT_NAME}
 
 file(GLOB_RECURSE SVG_FILES
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    assets/*.svg
+    Assets/*.svg
 )
 
 qt_add_resources(${PROJECT_NAME}
-    PREFIX "/assets"
-    BASE "assets"
-    FILES
-        ${SVG_FILES}
+    PREFIX "/Assets"
+    BASE "Assets"
+    FILES ${SVG_FILES}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -48,7 +46,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Quick
     PRIVATE ${QML_MODULES}
-    PRIVATE audio
+    PRIVATE Core
 )
 
 include(GNUInstallDirs)

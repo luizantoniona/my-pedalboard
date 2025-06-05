@@ -1,4 +1,4 @@
-set(LIBRARY_NAME audio)
+set(LIBRARY_NAME Audio)
 
 file(GLOB SOURCES
     *.cpp

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import Atoms
 import Organisms
 import Pages
 
@@ -32,18 +33,20 @@ Window {
 
     ColumnLayout {
         anchors.fill: parent
+        spacing: Spaces.spacing0
 
-        TopBar {
-            id: topBar
+        NavigationBar {
+            id: navigationBar
+
             Layout.fillWidth: true
             onNavigate: updatePage(page)
         }
 
         StackView {
             id: stack
+
             Layout.fillWidth: true
             Layout.fillHeight: true
-
             initialItem: pageHome
         }
     }
@@ -51,12 +54,12 @@ Window {
     Component {
         id: pageHome
 
-        PageHome {}
+        HomePage {}
     }
 
     Component {
         id: pageSettings
 
-        PageSettings {}
+        SettingsPage {}
     }
 }
