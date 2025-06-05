@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import Atoms
 import Organisms
 import Pages
 
@@ -32,6 +33,7 @@ Window {
 
     ColumnLayout {
         anchors.fill: parent
+        spacing: Spaces.spacing0
 
         TopBar {
             id: topBar

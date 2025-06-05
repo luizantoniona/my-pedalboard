@@ -6,12 +6,13 @@ file(GLOB QML_FILES_LIST
     "*.qml"
 )
 
-# set_source_files_properties(
+set_source_files_properties(
 #     ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
 #     ${CMAKE_CURRENT_SOURCE_DIR}/ColorsDark.qml
 #     ${CMAKE_CURRENT_SOURCE_DIR}/ColorsLight.qml
-#     PROPERTIES QT_QML_SINGLETON_TYPE TRUE
-# )
+    ${CMAKE_CURRENT_SOURCE_DIR}/Spaces.qml
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
+)
 
 qt_add_qml_module(${MODULE_NAME}
     URI ${MODULE_NAME}
