@@ -1,5 +1,5 @@
 import QtQuick
 
-PageSettingsDesign {
+HomePageDesign {
     id: root
 }

@@ -51,12 +51,12 @@ Window {
     Component {
         id: pageHome
 
-        PageHome {}
+        HomePage {}
     }
 
     Component {
         id: pageSettings
 
-        PageSettings {}
+        SettingsPage {}
     }
 }
