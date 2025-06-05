@@ -1,6 +1,6 @@
 import QtQuick
 
-TopBarDesign {
+NavigationBarDesign {
     id: root
 
     signal navigate(int page)

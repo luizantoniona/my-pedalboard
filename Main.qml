@@ -35,17 +35,18 @@ Window {
         anchors.fill: parent
         spacing: Spaces.spacing0
 
-        TopBar {
-            id: topBar
+        NavigationBar {
+            id: navigationBar
+
             Layout.fillWidth: true
             onNavigate: updatePage(page)
         }
 
         StackView {
             id: stack
+
             Layout.fillWidth: true
             Layout.fillHeight: true
-
             initialItem: pageHome
         }
     }
