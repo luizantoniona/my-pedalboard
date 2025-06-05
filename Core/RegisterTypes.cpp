@@ -1,8 +1,8 @@
-#include "registertypes.h"
+#include "RegisterTypes.h"
 
 #include <QQmlEngine>
 
-#include "audio/audiomanager.h"
+#include "audio/AudioManager.h"
 
 #include "Pages/HomePageControl.h"
 

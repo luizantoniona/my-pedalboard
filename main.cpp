@@ -4,7 +4,7 @@
 #include <QSurfaceFormat>
 #include <QTranslator>
 
-#include <core/registertypes.h>
+#include <Core/RegisterTypes.h>
 
 int main( int argc, char* argv[] ) {
 
