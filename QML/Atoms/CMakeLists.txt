@@ -7,9 +7,9 @@ file(GLOB QML_FILES_LIST
 )
 
 set_source_files_properties(
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
-#     ${CMAKE_CURRENT_SOURCE_DIR}/ColorsDark.qml
-#     ${CMAKE_CURRENT_SOURCE_DIR}/ColorsLight.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/ColorsDark.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/ColorsLight.qml
     ${CMAKE_CURRENT_SOURCE_DIR}/Spaces.qml
     PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
