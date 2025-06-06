@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QtCreatorCodeStyle>
+<qtcreator>
+ <data>
+  <variable>CodeStyleData</variable>
+  <valuemap type="QVariantMap">
+   <value type="bool" key="AutoDetect">true</value>
+   <value type="int" key="IndentSize">4</value>
+   <value type="int" key="TabSize">4</value>
+   <value type="bool" key="SpacesForTabs">true</value>
+   <value type="int" key="LineLength">100</value>
+   <value type="int" key="PaddingMode">2</value>
+   <value type="bool" key="IndentClosingBrace">true</value>
+   <value type="bool" key="IndentWrappedLines">true</value>
+   <value type="int" key="BracketPadding">1</value>        <!-- { foo: bar } -->
+   <value type="int" key="AssignmentPadding">1</value>     <!-- a = b -->
+   <value type="int" key="ColumnPadding">1</value>         <!-- property int a: 4 -->
+   <value type="bool" key="AlignAssignments">true</value>  <!-- Alinha os = em blocos -->
+   <value type="bool" key="AlignProperties">true</value>   <!-- Alinha `property` entre si -->
+  </valuemap>
+ </data>
+ <data>
+  <variable>DisplayName</variable>
+  <value type="QString">Qt</value>
+ </data>
+</qtcreator>
