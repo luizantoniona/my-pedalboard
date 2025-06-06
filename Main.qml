@@ -7,6 +7,8 @@ import Organisms
 import Pages
 
 Window {
+    id: window
+
     visible: true
     width: 1280
     height: 720
@@ -35,11 +37,25 @@ Window {
         anchors.fill: parent
         spacing: Spaces.spacing0
 
-        NavigationBar {
-            id: navigationBar
+        RowLayout {
 
-            Layout.fillWidth: true
-            onNavigate: updatePage(page)
+            spacing: Spaces.spacing0
+
+            NavigationBar {
+                id: navigationBar
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 0.1 * window.height
+                onNavigate: updatePage(page)
+            }
+
+            NavigationBar {
+                id: navigationBar1
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 0.1 * window.height
+                onNavigate: updatePage(page)
+            }
         }
 
         StackView {

@@ -4,8 +4,9 @@ import QtQuick.Controls
 Button {
     id: root
 
-    width: 40
-    height: 40
+    visible: vIconName !== ""
+    width: vIconSize
+    height: vIconSize
     icon.source: "qrc:/icons/outlined/" + vIconName + ".svg"
     icon.color: "blue"
 }

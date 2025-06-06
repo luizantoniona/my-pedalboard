@@ -12,27 +12,30 @@ Item {
 
     Rectangle {
 
-        color: "#333"
-        Layout.fillWidth: true
-        Layout.preferredHeight: 50
+        color: Colors.colors.background0
+        anchors.fill: parent
 
-        Row {
+        RowLayout {
 
+            Layout.alignment: Qt.AlignCenter
             anchors.fill: parent
 
             ButtonIcon {
                 id: buttonHome
                 vIconName: "home"
+                vIconSize: parent.height
             }
 
             ButtonIcon {
                 id: buttonSettings
                 vIconName: "settings"
+                vIconSize: parent.height
             }
 
             ButtonIcon {
                 id: buttonInfo
                 vIconName: "info-circle"
+                vIconSize: parent.height
             }
         }
     }

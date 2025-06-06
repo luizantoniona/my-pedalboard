@@ -4,5 +4,5 @@ ButtonIconDesign {
     id: root
 
     property string vIconName: ""
-    property real vIconSize: 40
+    property double vIconSize: 100
 }
