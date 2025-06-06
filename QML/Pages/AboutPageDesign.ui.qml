@@ -5,6 +5,6 @@ Item {
 
     Text {
         anchors.fill: parent
-        text: "Settings"
+        text: "About"
     }
 }
