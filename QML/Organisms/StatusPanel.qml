@@ -5,7 +5,7 @@ StatusPanelDesign {
 
     navigationBar {
         onNavigate: function (page) {
-            window.updatePage(page);
+            window.updatePage(page)
         }
     }
 }

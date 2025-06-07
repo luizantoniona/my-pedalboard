@@ -11,28 +11,32 @@ Item {
     property alias buttonSettings: buttonSettings
 
     RowLayout {
-        Layout.alignment: Qt.AlignHCenter
-        anchors.fill: parent
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        spacing: 12
 
         ButtonIcon {
             id: buttonHome
 
             vIconName: "outlined/home"
-            vIconSize: root.height
+            Layout.preferredWidth: root.height
+            Layout.preferredHeight: root.height
         }
 
         ButtonIcon {
             id: buttonSettings
 
             vIconName: "outlined/settings"
-            vIconSize: root.height
+            Layout.preferredWidth: root.height
+            Layout.preferredHeight: root.height
         }
 
         ButtonIcon {
             id: buttonAbout
 
             vIconName: "outlined/info-circle"
-            vIconSize: root.height
+            Layout.preferredWidth: root.height
+            Layout.preferredHeight: root.height
         }
     }
 }

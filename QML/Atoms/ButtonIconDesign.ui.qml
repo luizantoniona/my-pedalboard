@@ -1,12 +1,28 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Basic
 
-Button {
+Item {
     id: root
 
-    height: vIconSize
-    icon.color: "blue"
-    icon.source: "qrc:/icons/" + vIconName + ".svg"
+    property alias button: button
+
+    height: vSize
+    width: vSize
     visible: vIconName !== ""
-    width: vIconSize
+
+    Button {
+        id: button
+
+        anchors.fill: parent
+        background: Rectangle {
+            color: vColorBackground
+        }
+        icon {
+            source: "qrc:/icons/" + vIconName + ".svg"
+            color: vColorIcon
+            height: vSize
+            width: vSize
+        }
+    }
 }

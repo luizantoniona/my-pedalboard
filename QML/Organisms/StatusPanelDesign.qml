@@ -21,17 +21,19 @@ Item {
 
             GradientStop {
                 color: Colors.color.background1
-                position: 1.0
+                position: 0.9
             }
         }
 
         RowLayout {
-            anchors.fill: parent
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
             NavigationBar {
                 id: navigationBar
 
-                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignTop
+                Layout.preferredHeight: background.height
             }
         }
     }
