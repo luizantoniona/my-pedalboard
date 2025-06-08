@@ -1,19 +1,17 @@
 #ifndef AUDIOOUTPUTMANAGER_H
 #define AUDIOOUTPUTMANAGER_H
 
-#include <thread>
+#include <QObject>
 
-class AudioOutputManager {
+class AudioOutputManager : public QObject {
+    Q_OBJECT
+
 public:
-    AudioOutputManager();
+    AudioOutputManager( QObject* parent = nullptr );
     ~AudioOutputManager();
 
     void start();
     void stop();
-
-private:
-    std::thread _thread;
-    std::atomic<bool> _isRunning;
 };
 
 #endif // AUDIOOUTPUTMANAGER_H
