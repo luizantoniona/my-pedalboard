@@ -10,7 +10,7 @@ Item {
         ComboBox {
             id: inputSelector
 
-            model: deviceManager.inputDevicesNames
+            model: vInputDevices
         }
 
         Button {

@@ -1,11 +1,19 @@
 #include "AudioDeviceManager.h"
 
+#include <QDebug>
+#include <QTimer>
+
 AudioDeviceManager::AudioDeviceManager( QObject* parent ) :
     QObject( parent ),
-    _devices( new QMediaDevices( this ) ) {
+    _devices( new QMediaDevices( this ) ),
+    _inputDeviceNames( {} ),
+    _outputDeviceNames( {} ) {
 
-    connect( _devices, &QMediaDevices::audioInputsChanged, this, &AudioDeviceManager::inputDevicesChanged );
-    connect( _devices, &QMediaDevices::audioOutputsChanged, this, &AudioDeviceManager::outputDevicesChanged );
+    connect( _devices, &QMediaDevices::audioInputsChanged, this, &AudioDeviceManager::updateInputDeviceNames );
+    connect( _devices, &QMediaDevices::audioOutputsChanged, this, &AudioDeviceManager::updateOutputDeviceNames );
+
+    QTimer::singleShot( 0, this, &AudioDeviceManager::updateInputDeviceNames );
+    // QTimer::singleShot( 0, this, &AudioDeviceManager::updateOutputDeviceNames );
 }
 
 QList<QAudioDevice> AudioDeviceManager::inputDevices() const {
@@ -13,14 +21,7 @@ QList<QAudioDevice> AudioDeviceManager::inputDevices() const {
 }
 
 QList<QString> AudioDeviceManager::inputDevicesNames() const {
-    QList<QString> inputNames = {};
-    const QList<QAudioDevice> devices = inputDevices();
-
-    for ( const QAudioDevice& device : devices ) {
-        inputNames.append( device.description() );
-    }
-
-    return inputNames;
+    return _inputDeviceNames;
 }
 
 QList<QAudioDevice> AudioDeviceManager::outputDevices() const {
@@ -28,12 +29,36 @@ QList<QAudioDevice> AudioDeviceManager::outputDevices() const {
 }
 
 QList<QString> AudioDeviceManager::outputDevicesNames() const {
-    QList<QString> outputNames = {};
+    return _outputDeviceNames;
+}
+
+void AudioDeviceManager::updateInputDeviceNames() {
+
+    _inputDeviceNames.clear();
+
+    const QList<QAudioDevice> devices = inputDevices();
+
+    for ( const QAudioDevice& device : devices ) {
+        _inputDeviceNames.append( device.description() );
+    }
+
+    emit inputDevicesChanged();
+}
+
+void AudioDeviceManager::updateOutputDeviceNames() {
+
+    QElapsedTimer timer;
+    timer.start();
+
+    _outputDeviceNames.clear();
+
     const QList<QAudioDevice> devices = outputDevices();
 
     for ( const QAudioDevice& device : devices ) {
-        outputNames.append( device.description() );
+        _outputDeviceNames.append( device.description() );
     }
 
-    return outputNames;
+    qInfo() << "updateOutputDeviceNames took" << timer.elapsed() << "ms";
+
+    emit outputDevicesChanged();
 }

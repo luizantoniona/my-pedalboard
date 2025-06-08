@@ -4,7 +4,5 @@ import Audio
 AudioOutputPanelDesign {
     id: root
 
-    AudioDeviceManager {
-        id: deviceManager
-    }
+    property var vOutputDevices: AudioDeviceManager.outputDevicesNames
 }

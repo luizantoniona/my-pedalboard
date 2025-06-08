@@ -28,5 +28,5 @@ void RegisterTypes::registerControls() {
 void RegisterTypes::registerManagers() {
 
     // Audio Managers
-    qmlRegisterType<AudioDeviceManager>( "Audio", 1, 0, "AudioDeviceManager" );
+    qmlRegisterSingletonInstance<AudioDeviceManager>( "Audio", 1, 0, "AudioDeviceManager", new AudioDeviceManager() );
 }

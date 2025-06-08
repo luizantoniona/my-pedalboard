@@ -24,7 +24,12 @@ signals:
     void outputDevicesChanged();
 
 private:
+    void updateInputDeviceNames();
+    void updateOutputDeviceNames();
+
     QMediaDevices* _devices;
+    QList<QString> _inputDeviceNames;
+    QList<QString> _outputDeviceNames;
 };
 
 #endif // AUDIODEVICEMANAGER_H
