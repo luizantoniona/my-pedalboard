@@ -11,7 +11,7 @@ ButtonIconDesign {
     property color vColorBackground: Colors.color.background2
     property color vColorIcon: Colors.color.background0
 
-    button.onClicked: function (){
-        root.clicked();
+    button.onClicked: function () {
+        root.clicked()
     }
 }
