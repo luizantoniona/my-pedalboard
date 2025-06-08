@@ -47,9 +47,6 @@ void AudioDeviceManager::updateInputDeviceNames() {
 
 void AudioDeviceManager::updateOutputDeviceNames() {
 
-    QElapsedTimer timer;
-    timer.start();
-
     _outputDeviceNames.clear();
 
     const QList<QAudioDevice> devices = outputDevices();
@@ -57,8 +54,6 @@ void AudioDeviceManager::updateOutputDeviceNames() {
     for ( const QAudioDevice& device : devices ) {
         _outputDeviceNames.append( device.description() );
     }
-
-    qInfo() << "updateOutputDeviceNames took" << timer.elapsed() << "ms";
 
     emit outputDevicesChanged();
 }
