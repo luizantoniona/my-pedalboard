@@ -10,11 +10,11 @@ Item {
         ComboBox {
             id: inputSelector
 
-            model: ["TESTE INPUT", "TESTE1", "TESTE2"]
+            model: deviceManager.inputDevicesNames
         }
 
         Button {
-            text: "Start Input"
+            text: "Input"
         }
     }
 }
