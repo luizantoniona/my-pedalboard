@@ -7,6 +7,7 @@ public:
 
 private:
     static void registerControls();
+    static void registerManagers();
 };
 
 #endif // REGISTERTYPES_H

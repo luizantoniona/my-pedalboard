@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Multimedia)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -44,6 +45,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_link_libraries(${PROJECT_NAME}
+    PRIVATE Qt6::Core
+    PRIVATE Qt6::Multimedia
     PRIVATE Qt6::Quick
     PRIVATE ${QML_MODULES}
     PRIVATE Core

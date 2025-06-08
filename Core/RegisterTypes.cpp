@@ -2,14 +2,14 @@
 
 #include <QQmlEngine>
 
-#include "Audio/AudioManager.h"
+#include "Audio/AudioDeviceManager.h"
 #include "Molecules/NavigationBarControl.h"
 #include "Pages/HomePageControl.h"
 
 void RegisterTypes::registerTypes() {
 
     registerControls();
-
+    registerManagers();
 }
 
 void RegisterTypes::registerControls() {
@@ -23,5 +23,10 @@ void RegisterTypes::registerControls() {
 
     // Register Pages Controls
     qmlRegisterType<HomePageControl>( "Pages", 1, 0, "HomePageControl" );
+}
 
+void RegisterTypes::registerManagers() {
+
+    // Audio Managers
+    qmlRegisterType<AudioDeviceManager>( "Audio", 1, 0, "AudioDeviceManager" );
 }

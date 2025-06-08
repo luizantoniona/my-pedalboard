@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Atoms
 import Organisms
 
 Item {
@@ -19,7 +20,7 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: "#f0f0f0"
+                color: Colors.color.background2
                 Text {
                     anchors.centerIn: parent
                     text: "Aqui será colocado os pedais. No momento deixar vazio"
