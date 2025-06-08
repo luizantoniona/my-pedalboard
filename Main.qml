@@ -7,59 +7,78 @@ import Organisms
 import Pages
 
 Window {
-    visible: true
-    width: 1280
-    height: 720
-    title: "My Pedalboard"
-
-    property int currentPage: 0
+    id: window
 
     enum PageEnum {
+        About,
         Home,
         Settings
     }
 
     function updatePage(page) {
-        stack.clear()
+        stack.clear();
         switch (page) {
         case Main.PageEnum.Home:
-            stack.push(pageHome)
-            break
+            stack.push(pageHome);
+            break;
         case Main.PageEnum.Settings:
-            stack.push(pageSettings)
-            break
+            stack.push(pageSettings);
+            break;
+        case Main.PageEnum.About:
+            stack.push(pageAbout);
+            break;
         }
     }
 
-    ColumnLayout {
+    title: "My Pedalboard"
+    visibility: "FullScreen"
+    visible: true
+
+    Rectangle {
+        id: background
+
         anchors.fill: parent
-        spacing: Spaces.spacing0
+        color: Colors.color.background1
 
-        NavigationBar {
-            id: navigationBar
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: Spaces.spacing0
 
-            Layout.fillWidth: true
-            onNavigate: updatePage(page)
-        }
+            StatusPanel {
+                id: statusPanel
 
-        StackView {
-            id: stack
+                Layout.fillWidth: true
+                Layout.preferredHeight: 0.1 * background.height
+            }
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            initialItem: pageHome
+            StackView {
+                id: stack
+
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                initialItem: pageHome
+            }
         }
     }
 
     Component {
         id: pageHome
 
-        HomePage {}
+        HomePage {
+        }
     }
 
     Component {
         id: pageSettings
 
-        SettingsPage {}
+        SettingsPage {
+        }
+    }
+
+    Component {
+        id: pageAbout
+
+        AboutPage {
+        }
     }
 }
