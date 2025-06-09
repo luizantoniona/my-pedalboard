@@ -1,23 +1,22 @@
 #include "AudioDeviceManager.h"
 
-#include <QDebug>
 #include <QTimer>
 
 AudioDeviceManager::AudioDeviceManager( QObject* parent ) :
     QObject( parent ),
-    _devices( new QMediaDevices( this ) ),
+    _mediaDevices(),
     _inputDeviceNames( {} ),
     _outputDeviceNames( {} ) {
 
-    connect( _devices, &QMediaDevices::audioInputsChanged, this, &AudioDeviceManager::updateInputDeviceNames );
-    connect( _devices, &QMediaDevices::audioOutputsChanged, this, &AudioDeviceManager::updateOutputDeviceNames );
+    connect( &_mediaDevices, &QMediaDevices::audioInputsChanged, this, &AudioDeviceManager::updateInputDeviceNames );
+    connect( &_mediaDevices, &QMediaDevices::audioOutputsChanged, this, &AudioDeviceManager::updateOutputDeviceNames );
 
     QTimer::singleShot( 0, this, &AudioDeviceManager::updateInputDeviceNames );
-    // QTimer::singleShot( 0, this, &AudioDeviceManager::updateOutputDeviceNames );
+    QTimer::singleShot( 0, this, &AudioDeviceManager::updateOutputDeviceNames );
 }
 
 QList<QAudioDevice> AudioDeviceManager::inputDevices() const {
-    return _devices->audioInputs();
+    return _mediaDevices.audioInputs();
 }
 
 QList<QString> AudioDeviceManager::inputDevicesNames() const {
@@ -25,11 +24,37 @@ QList<QString> AudioDeviceManager::inputDevicesNames() const {
 }
 
 QList<QAudioDevice> AudioDeviceManager::outputDevices() const {
-    return _devices->audioOutputs();
+    return _mediaDevices.audioOutputs();
 }
 
 QList<QString> AudioDeviceManager::outputDevicesNames() const {
     return _outputDeviceNames;
+}
+
+QAudioDevice AudioDeviceManager::inputDeviceByName( const QString& name ) {
+    const auto devices = inputDevices();
+
+    for ( const QAudioDevice& device : devices ) {
+
+        if ( device.description() == name ) {
+            return device;
+        }
+    }
+
+    return _mediaDevices.defaultAudioInput();
+}
+
+QAudioDevice AudioDeviceManager::outputDeviceByName( const QString& name ) {
+    const auto devices = outputDevices();
+
+    for ( const QAudioDevice& device : devices ) {
+
+        if ( device.description() == name ) {
+            return device;
+        }
+    }
+
+    return _mediaDevices.defaultAudioOutput();
 }
 
 void AudioDeviceManager::updateInputDeviceNames() {

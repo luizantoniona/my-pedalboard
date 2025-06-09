@@ -19,6 +19,10 @@ public:
     QList<QAudioDevice> outputDevices() const;
     QList<QString> outputDevicesNames() const;
 
+public slots:
+    QAudioDevice inputDeviceByName( const QString& name );
+    QAudioDevice outputDeviceByName( const QString& name );
+
 signals:
     void inputDevicesChanged();
     void outputDevicesChanged();
@@ -27,7 +31,7 @@ private:
     void updateInputDeviceNames();
     void updateOutputDeviceNames();
 
-    QMediaDevices* _devices;
+    QMediaDevices _mediaDevices;
     QList<QString> _inputDeviceNames;
     QList<QString> _outputDeviceNames;
 };

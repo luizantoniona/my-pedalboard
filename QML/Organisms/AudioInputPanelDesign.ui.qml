@@ -4,6 +4,9 @@ import QtQuick.Controls
 Item {
     id: root
 
+    property alias button: button
+    property alias inputSelector: inputSelector
+
     Column {
         spacing: 10
 
@@ -14,6 +17,8 @@ Item {
         }
 
         Button {
+            id: button
+
             text: "Input"
         }
     }
