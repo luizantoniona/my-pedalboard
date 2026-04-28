@@ -6,27 +6,32 @@
 
 template <typename T> class Singleton {
 public:
-    template <typename... Args> static T& instance( Args&&... args ) {
-        std::call_once( initFlag, [ & ]() {
-            instancePtr.reset( new T( std::forward<Args>( args )... ) );
-        } );
-        return *instancePtr;
+    static T& instance() {
+        std::lock_guard<std::mutex> lock( _mutex );
+        if ( !_instance ) {
+            _instance = std::make_unique<T>();
+        }
+        return *_instance;
     }
 
-    Singleton( const Singleton& ) = delete;
-    Singleton& operator=( const Singleton& ) = delete;
+    static bool initialized() {
+        return _instance != nullptr;
+    }
 
 protected:
     Singleton() = default;
     virtual ~Singleton() = default;
 
+    Singleton( const Singleton& ) = delete;
+    Singleton& operator=( const Singleton& ) = delete;
+
 private:
-    static std::unique_ptr<T> instancePtr;
-    static std::once_flag initFlag;
+    static std::unique_ptr<T> _instance;
+    static std::mutex _mutex;
 };
 
-template <typename T> std::unique_ptr<T> Singleton<T>::instancePtr = nullptr;
+template <typename T> std::unique_ptr<T> Singleton<T>::_instance = nullptr;
 
-template <typename T> std::once_flag Singleton<T>::initFlag;
+template <typename T> std::mutex Singleton<T>::_mutex;
 
 #endif // SINGLETON_H

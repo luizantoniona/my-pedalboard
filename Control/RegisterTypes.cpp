@@ -2,15 +2,12 @@
 
 #include <QQmlEngine>
 
-#include <Audio/AudioDeviceManager.h>
-#include <Audio/AudioInputManager.h>
-#include <Audio/AudioOutputManager.h>
+#include <AudioEngine.h>
 
 #include <Molecules/NavigationBarControl.h>
 #include <Pages/HomePageControl.h>
 
 void RegisterTypes::registerTypes() {
-
     registerControls();
     registerManagers();
 }
@@ -30,8 +27,6 @@ void RegisterTypes::registerControls() {
 
 void RegisterTypes::registerManagers() {
 
-    // Audio Managers
-    qmlRegisterSingletonInstance<AudioDeviceManager>( "Audio", 1, 0, "AudioDeviceManager", new AudioDeviceManager() );
-    qmlRegisterSingletonInstance<AudioInputManager>( "Audio", 1, 0, "AudioInputManager", new AudioInputManager() );
-    qmlRegisterSingletonInstance<AudioOutputManager>( "Audio", 1, 0, "AudioOutputManager", new AudioOutputManager() );
+    // Audio Managers - singletons
+    qmlRegisterSingletonInstance<AudioEngine>( "Audio", 1, 0, "AudioEngine", new AudioEngine() );
 }
