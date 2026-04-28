@@ -2,12 +2,12 @@
 
 #include <QQmlEngine>
 
-#include "Audio/AudioDeviceManager.h"
-#include "Molecules/NavigationBarControl.h"
-#include "Pages/HomePageControl.h"
+#include <AudioEngine.h>
+
+#include <Molecules/NavigationBarControl.h>
+#include <Pages/HomePageControl.h>
 
 void RegisterTypes::registerTypes() {
-
     registerControls();
     registerManagers();
 }
@@ -27,6 +27,6 @@ void RegisterTypes::registerControls() {
 
 void RegisterTypes::registerManagers() {
 
-    // Audio Managers
-    qmlRegisterType<AudioDeviceManager>( "Audio", 1, 0, "AudioDeviceManager" );
+    // Audio Managers - singletons
+    qmlRegisterSingletonInstance<AudioEngine>( "Audio", 1, 0, "AudioEngine", new AudioEngine() );
 }

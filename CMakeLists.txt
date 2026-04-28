@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
 
+if(DEFINED ENV{VCPKG_ROOT})
+    file(TO_CMAKE_PATH "$ENV{VCPKG_ROOT}" VCPKG_ROOT_CMAKE)
+    set(CMAKE_TOOLCHAIN_FILE
+        "${VCPKG_ROOT_CMAKE}/scripts/buildsystems/vcpkg.cmake"
+        CACHE STRING ""
+    )
+endif()
+
 project(my-pedalboard VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -8,6 +16,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 find_package(Qt6 REQUIRED COMPONENTS Multimedia)
+find_package(RtAudio CONFIG REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -46,10 +55,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Core
-    PRIVATE Qt6::Multimedia
     PRIVATE Qt6::Quick
     PRIVATE ${QML_MODULES}
-    PRIVATE Core
+    PRIVATE Control
 )
 
 include(GNUInstallDirs)
@@ -58,3 +66,5 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+message(STATUS "Toolchain file: ${CMAKE_TOOLCHAIN_FILE}")

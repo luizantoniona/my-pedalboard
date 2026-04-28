@@ -4,17 +4,22 @@ import QtQuick.Controls
 Item {
     id: root
 
+    property alias button: button
+    property alias outputSelector: outputSelector
+
     Column {
         spacing: 10
 
         ComboBox {
             id: outputSelector
 
-            model: ["TESTE OUTPUT", "TESTE1", "TESTE2"]
+            model: vOutputDevices
         }
 
         Button {
-            text: "Start Input"
+            id: button
+
+            text: "Output"
         }
     }
 }

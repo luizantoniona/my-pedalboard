@@ -19,7 +19,7 @@ Item {
             color: vColorBackground
         }
         icon {
-            source: "qrc:/icons/" + vIconName + ".svg"
+            source: vIconName
             color: vColorIcon
             height: vSize
             width: vSize

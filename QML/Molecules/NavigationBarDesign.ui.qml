@@ -18,7 +18,7 @@ Item {
         ButtonIcon {
             id: buttonHome
 
-            vIconName: "outlined/home"
+            vIconName: Icons.iconOutlinedHome
             Layout.preferredWidth: root.height
             Layout.preferredHeight: root.height
         }
@@ -26,7 +26,7 @@ Item {
         ButtonIcon {
             id: buttonSettings
 
-            vIconName: "outlined/settings"
+            vIconName: Icons.iconOutlinedSettings
             Layout.preferredWidth: root.height
             Layout.preferredHeight: root.height
         }
@@ -34,7 +34,7 @@ Item {
         ButtonIcon {
             id: buttonAbout
 
-            vIconName: "outlined/info-circle"
+            vIconName: Icons.iconOutlinedInfoCircle
             Layout.preferredWidth: root.height
             Layout.preferredHeight: root.height
         }
