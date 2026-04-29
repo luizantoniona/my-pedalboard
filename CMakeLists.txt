@@ -21,9 +21,9 @@ find_package(RtAudio CONFIG REQUIRED)
 qt_standard_project_setup(REQUIRES 6.8)
 
 add_subdirectory(Translations)
-add_subdirectory(QML)
 add_subdirectory(Control)
-add_subdirectory(Core)
+add_subdirectory(Engine)
+add_subdirectory(QML)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
@@ -58,6 +58,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Quick
     PRIVATE ${QML_MODULES}
     PRIVATE Control
+    PRIVATE Engine
 )
 
 include(GNUInstallDirs)
