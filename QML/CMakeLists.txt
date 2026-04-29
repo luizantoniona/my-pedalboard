@@ -1,10 +1,10 @@
-set(MODULE_NAME qml)
+set(MODULE_NAME Application)
 
-# file(GLOB QML_FILES_LIST
-#     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-#     CONFIGURE_DEPENDS
-#     "*.qml"
-# )
+file(GLOB QML_FILES_LIST
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    CONFIGURE_DEPENDS
+    "*.qml"
+)
 
 qt_add_qml_module(${MODULE_NAME}
     URI ${MODULE_NAME}
