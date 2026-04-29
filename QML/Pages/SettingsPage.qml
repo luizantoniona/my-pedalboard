@@ -1,5 +1,5 @@
 import QtQuick
 
-SettingsPageDesign {
+Item {
     id: root
 }

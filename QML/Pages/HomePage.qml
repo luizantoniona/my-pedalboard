@@ -4,32 +4,16 @@ import QtQuick.Layouts
 import Audio
 import Pages
 
-HomePageDesign {
+Item {
     id: root
 
     ColumnLayout {
         anchors.fill: parent
+        spacing: 0
 
-    ComboBox {
-        id: inputCombo
-        model: AudioEngine.inputDevices
-        onCurrentTextChanged: AudioEngine.setInputDevice(currentText)
-    }
 
-    ComboBox {
-        id: outputCombo
-        model: AudioEngine.outputDevices
-        onCurrentTextChanged: AudioEngine.setOutputDevice(currentText)
-    }
 
-    Switch {
-        text: "Bypass"
-        onCheckedChanged: AudioEngine.setBypass(checked)
-    }
 
-    }
 
-    HomePageControl {
-        id: control
     }
 }
