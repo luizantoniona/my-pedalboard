@@ -17,5 +17,6 @@ add_subdirectory(Atoms)
 add_subdirectory(Molecules)
 add_subdirectory(Organisms)
 add_subdirectory(Pages)
+add_subdirectory(Theme)
 
 set(QML_MODULES ${QML_MODULES} ${MODULE_NAME} PARENT_SCOPE)

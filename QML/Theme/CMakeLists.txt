@@ -1,9 +1,16 @@
-set(MODULE_NAME Atoms)
+set(MODULE_NAME Theme)
 
 file(GLOB QML_FILES_LIST
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     CONFIGURE_DEPENDS
     "*.qml"
+)
+
+set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Icons.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Spacing.qml
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 
 qt_add_qml_module(${MODULE_NAME}
