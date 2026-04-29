@@ -13,7 +13,6 @@ qt_add_qml_module(${MODULE_NAME}
     QML_FILES ${QML_FILES_LIST}
 )
 
-add_subdirectory(Atoms)
 add_subdirectory(Molecules)
 add_subdirectory(Organisms)
 add_subdirectory(Pages)
