@@ -4,7 +4,8 @@
 #include <QSurfaceFormat>
 #include <QTranslator>
 
-#include <Control/RegisterTypes.h>
+#include <Control/RegisterControlTypes.h>
+#include <Engine/RegisterEngineTypes.h>
 
 int main( int argc, char* argv[] ) {
 
@@ -26,7 +27,8 @@ int main( int argc, char* argv[] ) {
 
     QQmlApplicationEngine engine;
 
-    RegisterTypes::registerTypes();
+    RegisterControlTypes::registerTypes();
+    RegisterEngineTypes::registerTypes();
 
     QObject::connect( &engine, &QQmlApplicationEngine::objectCreationFailed, &app, []() { QCoreApplication::exit( -1 ); }, Qt::QueuedConnection );
 
