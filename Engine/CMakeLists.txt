@@ -1,6 +1,6 @@
 add_subdirectory(Audio)
 
-set(LIBRARY_NAME Core)
+set(LIBRARY_NAME Engine)
 
 file(GLOB SOURCES
     *.cpp
@@ -21,5 +21,6 @@ target_include_directories(${LIBRARY_NAME}
 
 target_link_libraries(${LIBRARY_NAME}
     PRIVATE Qt6::Core
+    PRIVATE Qt6::Quick
     PRIVATE Audio
 )
