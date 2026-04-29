@@ -8,7 +8,7 @@ if(DEFINED ENV{VCPKG_ROOT})
     )
 endif()
 
-project(my-pedalboard VERSION 0.1 LANGUAGES CXX)
+project(MyPedalboard VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
