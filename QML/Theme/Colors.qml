@@ -21,10 +21,9 @@ QtObject {
     // ============================================
     // Primary / Accent Colors
     // ============================================
-    readonly property color primary: "#FF6B35"        // Orange accent
+    readonly property color primary: "#FF6B35"
     readonly property color primaryHover: "#FF8555"
     readonly property color primaryPressed: "#E55A25"
-    readonly property color primaryMuted: "#CC5528"
 
     // ============================================
     // Text Colors
@@ -43,23 +42,8 @@ QtObject {
     readonly property color info: "#2196F3"
 
     // ============================================
-    // LED Colors
-    // ============================================
-    readonly property color ledOn: "#FF6B35"
-    readonly property color ledOff: "#404040"
-    readonly property color ledBypass: "#F44336"
-
-    // ============================================
     // Border Colors
     // ============================================
     readonly property color border: "#404040"
     readonly property color borderFocus: "#FF6B35"
-
-    // ============================================
-    // Knob Colors
-    // ============================================
-    readonly property color knobBackground: "#2A2A2A"
-    readonly property color knobForeground: "#FF6B35"
-    readonly property color knobIndicator: "#FFFFFF"
-    readonly property color knobTrack: "#404040"
 }

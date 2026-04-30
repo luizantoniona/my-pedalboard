@@ -2,10 +2,10 @@
 
 #include <QQmlEngine>
 
-#include "Pages/HomePageControl.h"
+#include "AudioControl.h"
 
 void RegisterControlTypes::registerTypes() {
 
     // Register Pages Controls
-    qmlRegisterType<HomePageControl>( "Pages", 1, 0, "HomePageControl" );
+    qmlRegisterType<AudioControl>( "Control", 1, 0, "AudioControl" );
 }
