@@ -119,6 +119,5 @@ cmake --build build
 <p align="center">
   <img alt="GitHub count language" src="https://img.shields.io/github/languages/count/luizantoniona/my-pedalboard" />
   <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/luizantoniona/my-pedalboard" />
-  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/luizantoniona/my-pedalboard" />
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/luizantoniona/my-pedalboard" />
 </p>
