@@ -35,7 +35,7 @@ Item {
             model: audioControl.outputDevices
 
             onCurrentIndexChanged: function () {
-                audioControl.setInputDevice(this.currentIndex)
+                audioControl.setOutputDevice(this.currentIndex)
             }
         }
 
