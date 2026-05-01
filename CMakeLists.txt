@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
 find_package(RtAudio CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES
@@ -57,6 +58,7 @@ qt_add_resources(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Core
     PRIVATE Qt6::Quick
+    PRIVATE Qt6::QuickControls2
     PRIVATE RtAudio::rtaudio
     PRIVATE ${QML_MODULES}
 )

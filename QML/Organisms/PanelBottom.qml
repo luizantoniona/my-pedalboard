@@ -20,7 +20,17 @@ Item {
 
     RowLayout {
         anchors.fill: parent
+        anchors.leftMargin: Spacing.spacing4
+        anchors.rightMargin: Spacing.spacing4
         spacing: Spacing.spacing4
+
+        ComboBoxCustom {
+            model: audioControl.inputDevices
+
+            onCurrentIndexChanged: function () {
+                audioControl.setInputDevice(this.currentIndex)
+            }
+        }
 
         Item {
             Layout.fillWidth: true
@@ -33,8 +43,23 @@ Item {
             }
         }
 
+        ButtonText {
+            vText: "STOP"
+            onClicked: function () {
+                audioControl.stop()
+            }
+        }
+
         Item {
             Layout.fillWidth: true
+        }
+
+        ComboBoxCustom {
+            model: audioControl.outputDevices
+
+            onCurrentIndexChanged: function () {
+                audioControl.setOutputDevice(this.currentIndex)
+            }
         }
     }
 }

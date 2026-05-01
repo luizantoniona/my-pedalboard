@@ -1,29 +1,21 @@
 #include <QGuiApplication>
 #include <QLocale>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 #include <QSurfaceFormat>
-#include <QTranslator>
 
 #include <Control/RegisterControlTypes.h>
 #include <Engine/RegisterEngineTypes.h>
 
 int main( int argc, char* argv[] ) {
 
+    QQuickStyle::setStyle( "Basic" );
+
     QGuiApplication app( argc, argv );
 
     QSurfaceFormat format;
     format.setSamples( 8 );
     QSurfaceFormat::setDefaultFormat( format );
-
-    QTranslator translator;
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-    for ( const QString& locale : uiLanguages ) {
-        const QString baseName = "my-pedalboard_" + QLocale( locale ).name();
-        if ( translator.load( ":/translations/" + baseName ) ) {
-            app.installTranslator( &translator );
-            break;
-        }
-    }
 
     QQmlApplicationEngine engine;
 

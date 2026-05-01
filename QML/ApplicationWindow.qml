@@ -36,7 +36,7 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        TopBar {
+        PanelTop {
             Layout.fillWidth: true
             Layout.preferredHeight: 64
 
@@ -58,9 +58,10 @@ Item {
             Layout.fillHeight: true
         }
 
-        BottomBar {
+        PanelBottom {
             Layout.fillWidth: true
             Layout.preferredHeight: 128
+            audioControl: audioControl
         }
     }
 
