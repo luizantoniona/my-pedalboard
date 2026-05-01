@@ -10,6 +10,7 @@ set_source_files_properties(
     ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
     ${CMAKE_CURRENT_SOURCE_DIR}/Icons.qml
     ${CMAKE_CURRENT_SOURCE_DIR}/Spacing.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Radius.qml
     PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 

@@ -1,12 +1,13 @@
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
-import Molecules
+import QtQuick.Layouts
+import Atoms
 import Theme
 
 Item {
     id: root
 
+    signal homeClicked
     signal aboutClicked
     signal settingsClicked
 
@@ -36,24 +37,25 @@ Item {
             Layout.fillWidth: true
         }
 
-        Button {
-            id: settingsButton
-
-            implicitWidth: 32
-            implicitHeight: 32
-            text: "⚙"
-
-            onClicked: root.settingsClicked()
+        ButtonIcon {
+            vIcon: Icons.iconOutlinedHome
+            onClicked: function () {
+                root.homeClicked()
+            }
         }
 
-        Button {
-            id: aboutButton
+        ButtonIcon {
+            vIcon: Icons.iconOutlinedSettings
+            onClicked: function () {
+                root.settingsClicked()
+            }
+        }
 
-            implicitWidth: 32
-            implicitHeight: 32
-            text: "ℹ️"
-
-            onClicked: root.aboutClicked()
+        ButtonIcon {
+            vIcon: Icons.iconOutlinedInfoCircle
+            onClicked: function () {
+                root.aboutClicked()
+            }
         }
     }
 }

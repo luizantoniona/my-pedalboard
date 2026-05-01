@@ -1,4 +1,4 @@
-set(MODULE_NAME Application)
+set(MODULE_NAME Atoms)
 
 file(GLOB QML_FILES_LIST
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -12,11 +12,5 @@ qt_add_qml_module(${MODULE_NAME}
     OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${MODULE_NAME}"
     QML_FILES ${QML_FILES_LIST}
 )
-
-add_subdirectory(Atoms)
-add_subdirectory(Molecules)
-add_subdirectory(Organisms)
-add_subdirectory(Pages)
-add_subdirectory(Theme)
 
 set(QML_MODULES ${QML_MODULES} ${MODULE_NAME} PARENT_SCOPE)

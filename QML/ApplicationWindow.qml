@@ -40,6 +40,9 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 64
 
+            onHomeClicked: function () {
+                root.updatePage("home")
+            }
             onAboutClicked: function () {
                 root.updatePage("about")
             }
