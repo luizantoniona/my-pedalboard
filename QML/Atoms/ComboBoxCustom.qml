@@ -5,19 +5,20 @@ import Theme
 ComboBox {
     id: combo
 
-    property color contentColor: Colors.textPrimary
-    property color backgroundColor: Colors.surface
-    property color borderColor: Colors.border
-    property real cornerRadius: 12
-    property real itemHeight: 40
+    property color vColorBackground: Colors.background2
+    property color vColorBorder: Colors.primary
+    property color vColor: Colors.primary
 
-    implicitHeight: 44
-    width: 180
+    property real vWidth: 80
+    property real vHeight: 40
+
+    width: vWidth
+    implicitHeight: vHeight
 
     background: Rectangle {
-        color: combo.backgroundColor
-        radius: combo.cornerRadius
-        border.color: combo.borderColor
+        color: vColorBackground
+        radius: Radius.radius8
+        border.color: vColorBorder
         border.width: 1
     }
 
@@ -25,10 +26,10 @@ ComboBox {
         anchors.fill: parent
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
-        anchors.leftMargin: 14
-        anchors.rightMargin: 26
+        anchors.leftMargin: Spacing.spacing4
+        anchors.rightMargin: Spacing.spacing4
         text: combo.currentText
-        color: combo.contentColor
+        color: vColor
         elide: Text.ElideRight
     }
 
@@ -40,9 +41,7 @@ ComboBox {
 
         Text {
             anchors.centerIn: parent
-            text: "\u25BE"
-            color: combo.contentColor
-            font.pixelSize: 14
+            color: vColor
         }
     }
 }
