@@ -12,8 +12,9 @@ AudioWorker::AudioWorker( QObject* parent ) :
     _inputId( 0 ),
     _outputId( 0 ),
     _sampleRate( 48000 ),
-    _bufferFrames( 256 ),
+    _frameBuffer( 256 ),
     _isRunning( false ) {
+
     qInfo() << "AudioWorker::AudioWorker";
 }
 
@@ -32,6 +33,8 @@ void AudioWorker::start() {
     }
 
     openStream();
+
+    qInfo() << "AudioWorker::start - started";
 }
 
 void AudioWorker::stop() {
@@ -40,8 +43,6 @@ void AudioWorker::stop() {
     }
 
     closeStream();
-
-    emit stopped();
 
     qInfo() << "AudioWorker::stop - stopped";
 }
@@ -77,6 +78,38 @@ void AudioWorker::setOutputDevice( int index ) {
         stop();
         start();
     }
+}
+
+void AudioWorker::setSampleRate( unsigned int sampleRate ) {
+    if ( sampleRate == _sampleRate ) {
+        return;
+    }
+
+    _sampleRate = sampleRate;
+
+    if ( _isRunning ) {
+        restartStream();
+    }
+}
+
+unsigned int AudioWorker::sampleRate() const {
+    return _sampleRate;
+}
+
+void AudioWorker::setFrameBuffer( unsigned int frameBuffer ) {
+    if ( frameBuffer == _frameBuffer ) {
+        return;
+    }
+
+    _frameBuffer = frameBuffer;
+
+    if ( _isRunning ) {
+        restartStream();
+    }
+}
+
+unsigned int AudioWorker::frameBuffer() const {
+    return _frameBuffer;
 }
 
 QStringList AudioWorker::enumerateInputs() {
@@ -133,14 +166,15 @@ void AudioWorker::openStream() {
     }
 
     try {
-        _audio.openStream( _outputId ? &outParams : nullptr, _inputId ? &inParams : nullptr, RTAUDIO_FLOAT32, _sampleRate, &_bufferFrames, &AudioWorker::callback, this );
+        _audio.openStream( _outputId ? &outParams : nullptr, _inputId ? &inParams : nullptr, RTAUDIO_FLOAT32, _sampleRate, &_frameBuffer, &AudioWorker::callback, this );
         _audio.startStream();
 
         _isRunning = true;
 
-        emit started();
-
-        qInfo() << "AudioWorker::openStream - started with" << inputChannels << "input channels," << outputChannels << "output channels," << _bufferFrames << "buffer frames";
+        qInfo() << "AudioWorker::openStream - started with"
+                << inputChannels << "input channels,"
+                << outputChannels << "output channels,"
+                << _frameBuffer << "frame buffer";
 
     } catch ( ... ) {
         emit error( "Failed to open stream" );
@@ -155,6 +189,12 @@ void AudioWorker::closeStream() {
     }
 }
 
+void AudioWorker::restartStream() {
+    qInfo() << "AudioWorker::restartStream";
+    stop();
+    start();
+}
+
 int AudioWorker::callback( void* out, void* in, unsigned int nFrames, double, RtAudioStreamStatus status, void* userData ) {
     auto* self = static_cast<AudioWorker*>( userData );
 
@@ -167,8 +207,8 @@ void AudioWorker::process( const float* in, float* out, unsigned int nFrames ) {
     for ( unsigned int i = 0; i < nFrames; i++ ) {
         float s = in ? in[ i ] : 0.0f;
 
-        out[ 2 * i ] = s;
-        out[ 2 * i + 1 ] = s;
+        out[ 2 * i ] = s * 5;
+        out[ 2 * i + 1 ] = s * 5;
     }
 }
 

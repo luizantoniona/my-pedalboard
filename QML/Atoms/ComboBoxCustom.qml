@@ -17,7 +17,7 @@ ComboBox {
 
     background: Rectangle {
         color: vColorBackground
-        radius: Radius.radius8
+        radius: Radius.radius4
         border.color: vColorBorder
         border.width: 1
     }

@@ -22,10 +22,14 @@ public slots:
     void setInputDevice( int index );
     void setOutputDevice( int index );
 
+    void setSampleRate( unsigned int sampleRate );
+    unsigned int sampleRate() const;
+
+    void setFrameBuffer( unsigned int frameBuffer );
+    unsigned int frameBuffer() const;
+
 signals:
     void devicesReady( QStringList inputs, QStringList outputs );
-    void started();
-    void stopped();
     void error( QString message );
 
 private:
@@ -34,6 +38,7 @@ private:
 
     void openStream();
     void closeStream();
+    void restartStream();
 
     static int callback( void* out, void* in, unsigned int nFrames, double, RtAudioStreamStatus status, void* userData );
 
@@ -49,7 +54,7 @@ private:
     unsigned int _outputId;
 
     unsigned int _sampleRate;
-    unsigned int _bufferFrames;
+    unsigned int _frameBuffer;
 
     bool _isRunning;
 };
