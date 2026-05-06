@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Atoms
+import Molecules
 import Theme
 
 Item {
@@ -52,6 +53,17 @@ Item {
 
         Item {
             Layout.fillWidth: true
+        }
+
+        LevelBar {
+            id: volumeBar
+            vMinimum: -60
+            vMaximum: 12
+            vValue: 0
+
+            onValueChanged: function () {
+                console.log("TESTE")
+            }
         }
 
         ComboBoxCustom {
