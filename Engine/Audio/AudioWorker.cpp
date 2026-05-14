@@ -13,6 +13,7 @@ AudioWorker::AudioWorker( QObject* parent ) :
     _outputId( 0 ),
     _sampleRate( 48000 ),
     _frameBuffer( 256 ),
+    _outputVolume( 1.0f ),
     _isRunning( false ) {
 
     qInfo() << "AudioWorker::AudioWorker";
@@ -112,6 +113,14 @@ unsigned int AudioWorker::frameBuffer() const {
     return _frameBuffer;
 }
 
+void AudioWorker::setOutputVolume( float outputVolume ) {
+    _outputVolume.store( std::clamp( outputVolume, 0.0f, 4.0f ) );
+}
+
+float AudioWorker::OutputVolume() const {
+    return _outputVolume.load();
+}
+
 QStringList AudioWorker::enumerateInputs() {
     QStringList list;
     _inputIds.clear();
@@ -204,11 +213,23 @@ int AudioWorker::callback( void* out, void* in, unsigned int nFrames, double, Rt
 }
 
 void AudioWorker::process( const float* in, float* out, unsigned int nFrames ) {
+    // TODO: We should move the stereo signals buffer initialization from here
+    std::vector<float> left( nFrames );
+    std::vector<float> right( nFrames );
+
     for ( unsigned int i = 0; i < nFrames; i++ ) {
         float s = in ? in[ i ] : 0.0f;
 
-        out[ 2 * i ] = s * 5;
-        out[ 2 * i + 1 ] = s * 5;
+        left[ i ] = s;
+        right[ i ] = s;
+    }
+
+    // TODO: See if this is the best way to process chain signals
+    // _audioChain.process( left.data(), right.data(), nFrames );
+
+    for ( unsigned int i = 0; i < nFrames; i++ ) {
+        out[ 2 * i ] = std::clamp( left[ i ], -1.0f, 1.0f );
+        out[ 2 * i + 1 ] = std::clamp( right[ i ], -1.0f, 1.0f );
     }
 }
 

@@ -1,6 +1,8 @@
 #ifndef AUDIOWORKER_H
 #define AUDIOWORKER_H
 
+#include <atomic>
+
 #include <QObject>
 
 #include <RtAudio.h>
@@ -27,6 +29,9 @@ public slots:
 
     void setFrameBuffer( unsigned int frameBuffer );
     unsigned int frameBuffer() const;
+
+    void setOutputVolume( float outputVolume );
+    float OutputVolume() const;
 
 signals:
     void devicesReady( QStringList inputs, QStringList outputs );
@@ -55,6 +60,8 @@ private:
 
     unsigned int _sampleRate;
     unsigned int _frameBuffer;
+
+    std::atomic<float> _outputVolume;
 
     bool _isRunning;
 };
