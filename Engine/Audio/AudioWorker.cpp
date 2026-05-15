@@ -6,65 +6,58 @@ namespace Engine {
 
 AudioWorker::AudioWorker( QObject* parent ) :
     QObject( parent ),
-    _audio(),
-    _inputIds(),
-    _outputIds(),
-    _inputId( 0 ),
-    _outputId( 0 ),
-    _sampleRate( 48000 ),
-    _frameBuffer( 256 ),
+    _inputId( std::numeric_limits<unsigned int>::max() ),
+    _outputId( std::numeric_limits<unsigned int>::max() ),
+    _sampleRate( 96000 ),
+    _frameBuffer( 128 ),
     _outputVolume( 1.0f ),
-    _isRunning( false ) {
+    _inputRunning( false ),
+    _outputRunning( false ) {
 
-    qInfo() << "AudioWorker::AudioWorker";
+    qInfo() << "AudioWorker";
+
+    _leftBuffer.resize( _frameBuffer );
+    _rightBuffer.resize( _frameBuffer );
+
+    requestDevices();
+
+    qInfo() << "AudioWorker";
 }
 
 AudioWorker::~AudioWorker() {
-    qInfo() << "AudioWorker::~AudioWorker";
+    qInfo() << "~AudioWorker";
+
+    stop();
+
+    qInfo() << "~AudioWorker";
 }
 
 void AudioWorker::start() {
-    if ( _isRunning ) {
-        return;
-    }
-
-    if ( _inputId == 0 && _outputId == 0 ) {
-        emit error( "No device selected" );
-        return;
-    }
-
-    openStream();
-
-    qInfo() << "AudioWorker::start - started";
+    openInputStream();
+    openOutputStream();
 }
 
 void AudioWorker::stop() {
-    if ( !_isRunning ) {
-        return;
-    }
-
-    closeStream();
-
-    qInfo() << "AudioWorker::stop - stopped";
+    closeInputStream();
+    closeOutputStream();
 }
 
 void AudioWorker::requestDevices() {
-    auto inputs = enumerateInputs();
-    auto outputs = enumerateOutputs();
-
-    emit devicesReady( inputs, outputs );
+    emit devicesReady( enumerateInputs(), enumerateOutputs() );
 }
 
 void AudioWorker::setInputDevice( int index ) {
     if ( index < 0 || index >= _inputIds.size() ) {
         return;
     }
+
     _inputId = _inputIds[ index ];
 
-    if ( _isRunning ) {
-        qInfo() << "AudioWorker::setInputDevice - restarting stream with new input device";
-        stop();
-        start();
+    qInfo() << "Input device changed:" << index;
+
+    if ( _inputRunning ) {
+        closeInputStream();
+        openInputStream();
     }
 }
 
@@ -72,12 +65,14 @@ void AudioWorker::setOutputDevice( int index ) {
     if ( index < 0 || index >= _outputIds.size() ) {
         return;
     }
+
     _outputId = _outputIds[ index ];
 
-    if ( _isRunning ) {
-        qInfo() << "AudioWorker::setOutputDevice - restarting stream with new output device";
-        stop();
-        start();
+    qInfo() << "Output device changed:" << index;
+
+    if ( _outputRunning ) {
+        closeOutputStream();
+        openOutputStream();
     }
 }
 
@@ -88,9 +83,7 @@ void AudioWorker::setSampleRate( unsigned int sampleRate ) {
 
     _sampleRate = sampleRate;
 
-    if ( _isRunning ) {
-        restartStream();
-    }
+    restartStreams();
 }
 
 unsigned int AudioWorker::sampleRate() const {
@@ -104,9 +97,10 @@ void AudioWorker::setFrameBuffer( unsigned int frameBuffer ) {
 
     _frameBuffer = frameBuffer;
 
-    if ( _isRunning ) {
-        restartStream();
-    }
+    _leftBuffer.resize( _frameBuffer );
+    _rightBuffer.resize( _frameBuffer );
+
+    restartStreams();
 }
 
 unsigned int AudioWorker::frameBuffer() const {
@@ -117,22 +111,34 @@ void AudioWorker::setOutputVolume( float outputVolume ) {
     _outputVolume.store( std::clamp( outputVolume, 0.0f, 4.0f ) );
 }
 
-float AudioWorker::OutputVolume() const {
+float AudioWorker::outputVolume() const {
     return _outputVolume.load();
 }
 
 QStringList AudioWorker::enumerateInputs() {
     QStringList list;
+
     _inputIds.clear();
 
-    auto ids = _audio.getDeviceIds();
+    auto ids = _audioInput.getDeviceIds();
 
     for ( auto id : ids ) {
-        auto info = _audio.getDeviceInfo( id );
-        if ( info.inputChannels > 0 ) {
-            _inputIds.push_back( id );
-            list << QString::fromStdString( info.name );
+
+        auto info = _audioInput.getDeviceInfo( id );
+
+        if ( info.inputChannels <= 0 ) {
+            continue;
         }
+
+        _inputIds.push_back( id );
+
+        list << QString::fromStdString( info.name );
+
+        qInfo() << "[INPUT]" << QString::fromStdString( info.name ) << "id:" << id;
+    }
+
+    if ( !_inputIds.isEmpty() ) {
+        _inputId = _inputIds.first();
     }
 
     return list;
@@ -140,96 +146,166 @@ QStringList AudioWorker::enumerateInputs() {
 
 QStringList AudioWorker::enumerateOutputs() {
     QStringList list;
+
     _outputIds.clear();
 
-    auto ids = _audio.getDeviceIds();
+    auto ids = _audioOutput.getDeviceIds();
 
     for ( auto id : ids ) {
-        auto info = _audio.getDeviceInfo( id );
-        if ( info.outputChannels > 0 ) {
-            _outputIds.push_back( id );
-            list << QString::fromStdString( info.name );
+
+        auto info = _audioOutput.getDeviceInfo( id );
+
+        if ( info.outputChannels <= 0 ) {
+            continue;
         }
+
+        _outputIds.push_back( id );
+
+        list << QString::fromStdString( info.name );
+
+        qInfo() << "[OUTPUT]" << QString::fromStdString( info.name ) << "id:" << id;
+    }
+
+    if ( !_outputIds.isEmpty() ) {
+        _outputId = _outputIds.first();
     }
 
     return list;
 }
 
-void AudioWorker::openStream() {
-    closeStream();
-
-    RtAudio::StreamParameters inParams, outParams;
-    unsigned int inputChannels = 0;
-    unsigned int outputChannels = 0;
-
-    if ( _inputId != 0 ) {
-        inParams.deviceId = _inputId;
-        inParams.nChannels = 1;
-        inputChannels = 1;
+void AudioWorker::openInputStream() {
+    if ( _inputId == std::numeric_limits<unsigned int>::max() ) {
+        return;
     }
 
-    if ( _outputId != 0 ) {
-        outParams.deviceId = _outputId;
-        outParams.nChannels = 2;
-        outputChannels = 2;
-    }
+    closeInputStream();
 
     try {
-        _audio.openStream( _outputId ? &outParams : nullptr, _inputId ? &inParams : nullptr, RTAUDIO_FLOAT32, _sampleRate, &_frameBuffer, &AudioWorker::callback, this );
-        _audio.startStream();
+        auto info = _audioInput.getDeviceInfo( _inputId );
 
-        _isRunning = true;
+        RtAudio::StreamParameters params;
+        params.deviceId = _inputId;
+        params.nChannels = std::min( 2u, info.inputChannels );
 
-        qInfo() << "AudioWorker::openStream - started with"
-                << inputChannels << "input channels,"
-                << outputChannels << "output channels,"
-                << _frameBuffer << "frame buffer";
+        _audioInput.openStream( nullptr, &params, RTAUDIO_FLOAT32, _sampleRate, &_frameBuffer, &AudioWorker::inputCallback, this );
+        _audioInput.startStream();
 
-    } catch ( ... ) {
-        emit error( "Failed to open stream" );
+        _inputRunning = true;
+
+        qInfo() << "Input stream started";
+
+    } catch ( RtAudioErrorType& e ) {
+        qWarning() << "[INPUT ERROR]" << e;
     }
 }
 
-void AudioWorker::closeStream() {
-    if ( _audio.isStreamOpen() ) {
-        _audio.closeStream();
-        _isRunning = false;
-        qInfo() << "AudioWorker::closeStream - stream closed";
+void AudioWorker::openOutputStream() {
+    if ( _outputId == std::numeric_limits<unsigned int>::max() ) {
+        return;
+    }
+
+    closeOutputStream();
+
+    try {
+        RtAudio::StreamParameters params;
+        params.deviceId = _outputId;
+        params.nChannels = 2;
+
+        _audioOutput.openStream( &params, nullptr, RTAUDIO_FLOAT32, _sampleRate, &_frameBuffer, &AudioWorker::outputCallback, this );
+        _audioOutput.startStream();
+
+        _outputRunning = true;
+
+        qInfo() << "Output stream started";
+
+    } catch ( RtAudioErrorType& e ) {
+        qWarning() << "[OUTPUT ERROR]" << e;
     }
 }
 
-void AudioWorker::restartStream() {
-    qInfo() << "AudioWorker::restartStream";
+void AudioWorker::closeInputStream() {
+    try {
+        if ( _audioInput.isStreamRunning() ) {
+            _audioInput.stopStream();
+        }
+
+        if ( _audioInput.isStreamOpen() ) {
+            _audioInput.closeStream();
+        }
+
+    } catch ( RtAudioErrorType& e ) {
+        qWarning() << "[INPUT ERROR]" << e;
+    }
+
+    _inputRunning = false;
+}
+
+void AudioWorker::closeOutputStream() {
+    try {
+        if ( _audioOutput.isStreamRunning() ) {
+            _audioOutput.stopStream();
+        }
+
+        if ( _audioOutput.isStreamOpen() ) {
+            _audioOutput.closeStream();
+        }
+
+    } catch ( RtAudioErrorType& e ) {
+        qWarning() << "[OUTPUT ERROR]" << e;
+    }
+
+    _outputRunning = false;
+}
+
+void AudioWorker::restartStreams() {
     stop();
     start();
 }
 
-int AudioWorker::callback( void* out, void* in, unsigned int nFrames, double, RtAudioStreamStatus status, void* userData ) {
+int AudioWorker::inputCallback( void*, void* in, unsigned int nFrames, double, RtAudioStreamStatus, void* userData ) {
     auto* self = static_cast<AudioWorker*>( userData );
-
-    self->process( static_cast<const float*>( in ), static_cast<float*>( out ), nFrames );
-
+    self->processInput( static_cast<const float*>( in ), nFrames );
     return 0;
 }
 
-void AudioWorker::process( const float* in, float* out, unsigned int nFrames ) {
-    // TODO: We should move the stereo signals buffer initialization from here
-    std::vector<float> left( nFrames );
-    std::vector<float> right( nFrames );
+int AudioWorker::outputCallback( void* out, void*, unsigned int nFrames, double, RtAudioStreamStatus, void* userData ) {
+    auto* self = static_cast<AudioWorker*>( userData );
+    self->processOutput( static_cast<float*>( out ), nFrames );
+    return 0;
+}
 
-    for ( unsigned int i = 0; i < nFrames; i++ ) {
-        float s = in ? in[ i ] : 0.0f;
-
-        left[ i ] = s;
-        right[ i ] = s;
+void AudioWorker::processInput( const float* input, unsigned int nFrames ) {
+    if ( !input ) {
+        return;
     }
 
-    // TODO: See if this is the best way to process chain signals
-    // _audioChain.process( left.data(), right.data(), nFrames );
+    for ( unsigned int i = 0; i < nFrames; ++i ) {
+        _ringBuffer.push_back( input[ i ] );
+    }
+}
 
-    for ( unsigned int i = 0; i < nFrames; i++ ) {
-        out[ 2 * i ] = std::clamp( left[ i ], -1.0f, 1.0f );
-        out[ 2 * i + 1 ] = std::clamp( right[ i ], -1.0f, 1.0f );
+void AudioWorker::processOutput( float* output, unsigned int nFrames ) {
+    if ( !output ) {
+        return;
+    }
+
+    float volume = _outputVolume.load();
+
+    for ( unsigned int i = 0; i < nFrames; ++i ) {
+
+        float sample = 0.0f;
+
+        if ( !_ringBuffer.empty() ) {
+            sample = _ringBuffer.front();
+            _ringBuffer.erase( _ringBuffer.begin() );
+        }
+
+        sample *= volume;
+        _leftBuffer[ i ] = std::clamp( sample, -1.0f, 1.0f );
+        _rightBuffer[ i ] = std::clamp( sample, -1.0f, 1.0f );
+
+        output[ 2 * i ] = _leftBuffer[ i ];
+        output[ 2 * i + 1 ] = _rightBuffer[ i ];
     }
 }
 

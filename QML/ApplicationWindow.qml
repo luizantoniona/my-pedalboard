@@ -37,6 +37,7 @@ Item {
         spacing: 0
 
         PanelTop {
+            audioControl: audioControl
             Layout.fillWidth: true
             Layout.preferredHeight: 64
 
@@ -59,9 +60,9 @@ Item {
         }
 
         PanelBottom {
+            audioControl: audioControl
             Layout.fillWidth: true
             Layout.preferredHeight: 128
-            audioControl: audioControl
         }
     }
 

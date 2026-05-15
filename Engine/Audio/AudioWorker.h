@@ -2,6 +2,7 @@
 #define AUDIOWORKER_H
 
 #include <atomic>
+#include <vector>
 
 #include <QObject>
 
@@ -21,6 +22,7 @@ public slots:
     void stop();
 
     void requestDevices();
+
     void setInputDevice( int index );
     void setOutputDevice( int index );
 
@@ -31,7 +33,7 @@ public slots:
     unsigned int frameBuffer() const;
 
     void setOutputVolume( float outputVolume );
-    float OutputVolume() const;
+    float outputVolume() const;
 
 signals:
     void devicesReady( QStringList inputs, QStringList outputs );
@@ -41,16 +43,23 @@ private:
     QStringList enumerateInputs();
     QStringList enumerateOutputs();
 
-    void openStream();
-    void closeStream();
-    void restartStream();
+    void openInputStream();
+    void openOutputStream();
 
-    static int callback( void* out, void* in, unsigned int nFrames, double, RtAudioStreamStatus status, void* userData );
+    void closeInputStream();
+    void closeOutputStream();
 
-    void process( const float* in, float* out, unsigned int nFrames );
+    void restartStreams();
+
+    static int inputCallback( void* out, void* in, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void* userData );
+    static int outputCallback( void* out, void* in, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void* userData );
+
+    void processInput( const float* input, unsigned int nFrames );
+    void processOutput( float* output, unsigned int nFrames );
 
 private:
-    RtAudio _audio;
+    RtAudio _audioInput;
+    RtAudio _audioOutput;
 
     QVector<unsigned int> _inputIds;
     QVector<unsigned int> _outputIds;
@@ -63,7 +72,13 @@ private:
 
     std::atomic<float> _outputVolume;
 
-    bool _isRunning;
+    std::vector<float> _ringBuffer;
+
+    std::vector<float> _leftBuffer;
+    std::vector<float> _rightBuffer;
+
+    std::atomic<bool> _inputRunning;
+    std::atomic<bool> _outputRunning;
 };
 
 } // namespace Engine
