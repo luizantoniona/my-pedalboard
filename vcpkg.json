@@ -1,6 +1,15 @@
 {
   "dependencies": [
-    "rtaudio",
+    {
+      "name": "rtaudio",
+      "features": [ "asio" ],
+      "platform": "windows"
+    },
+    {
+      "name": "rtaudio",
+      "features": [ "alsa", "pulse" ],
+      "platform": "linux"
+    },
     "gtest"
   ]
 }
