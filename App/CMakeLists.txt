@@ -8,6 +8,8 @@ qt_add_qml_module(MyPedalboard
     QML_FILES
         Main.qml
 
+add_subdirectory(Control)
+
 file(GLOB_RECURSE SVG_FILES
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     Assets/*.svg
