@@ -28,17 +28,6 @@ add_subdirectory(Control)
 add_subdirectory(QML)
 add_subdirectory(App)
 
-file(GLOB_RECURSE SVG_FILES
-    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    Assets/*.svg
-)
-
-qt_add_resources(${PROJECT_NAME}
-    PREFIX "/Assets"
-    BASE "Assets"
-    FILES ${SVG_FILES}
-)
-
 if(MY_PEDALBOARD_BUILD_TESTS)
     enable_testing()
     add_subdirectory(Test)

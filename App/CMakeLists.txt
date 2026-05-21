@@ -7,6 +7,16 @@ qt_add_qml_module(MyPedalboard
     VERSION 1.0
     QML_FILES
         Main.qml
+
+file(GLOB_RECURSE SVG_FILES
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    Assets/*.svg
+)
+
+qt_add_resources(${PROJECT_NAME}
+    PREFIX "/Assets"
+    BASE "Assets"
+    FILES ${SVG_FILES}
 )
 
 target_link_libraries(MyPedalboard
