@@ -26,6 +26,7 @@ Item {
         spacing: Spacing.spacing4
 
         ComboBoxCustom {
+            Layout.fillWidth: true
             model: audioControl.inputDevices
 
             onCurrentIndexChanged: function () {
@@ -37,36 +38,8 @@ Item {
             Layout.fillWidth: true
         }
 
-        ButtonText {
-            vText: "PLAY"
-            onClicked: function () {
-                audioControl.start()
-            }
-        }
-
-        ButtonText {
-            vText: "STOP"
-            onClicked: function () {
-                audioControl.stop()
-            }
-        }
-
-        Item {
-            Layout.fillWidth: true
-        }
-
-        LevelBar {
-            id: volumeBar
-            vMinimum: -60
-            vMaximum: 12
-            vValue: 0
-
-            onValueChanged: function () {
-                console.log("TESTE")
-            }
-        }
-
         ComboBoxCustom {
+            Layout.fillWidth: true
             model: audioControl.outputDevices
 
             onCurrentIndexChanged: function () {

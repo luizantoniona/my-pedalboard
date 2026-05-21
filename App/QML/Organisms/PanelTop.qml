@@ -7,6 +7,8 @@ import Theme
 Item {
     id: root
 
+    property var audioControl
+
     signal homeClicked
     signal aboutClicked
     signal settingsClicked
@@ -31,6 +33,24 @@ Item {
             color: Colors.textPrimary
             font.pixelSize: 16
             font.weight: Font.Bold
+        }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        ButtonIcon {
+            vIcon: Icons.iconOutlinedPlayerPlay
+            onClicked: function () {
+                audioControl.start()
+            }
+        }
+
+        ButtonIcon {
+            vIcon: Icons.iconOutlinedPlayerStop
+            onClicked: function () {
+                audioControl.stop()
+            }
         }
 
         Item {

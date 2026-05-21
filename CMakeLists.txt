@@ -24,7 +24,6 @@ find_package(RtAudio CONFIG REQUIRED)
 qt_standard_project_setup(REQUIRES 6.8)
 
 add_subdirectory(Engine)
-add_subdirectory(QML)
 add_subdirectory(App)
 
 if(MY_PEDALBOARD_BUILD_TESTS)
