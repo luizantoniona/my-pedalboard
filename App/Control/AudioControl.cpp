@@ -9,6 +9,8 @@ AudioControl::AudioControl() {
     connect( &_engine, &Engine::AudioEngine::devicesChanged, this, &AudioControl::devicesChanged );
     // TODO
     // connect( &_engine, &Engine::AudioEngine::driverAPIsChanged, this, &AudioControl::driverAPIsChanged );
+    // connect( &_engine, &Engine::AudioEngine::sampleRatesChanged, this, &AudioControl::sampleRatesChanged );
+    // connect( &_engine, &Engine::AudioEngine::frameBuffersChanged, this, &AudioControl::frameBuffersChanged );
 }
 
 AudioControl::~AudioControl() {
@@ -28,6 +30,16 @@ QStringList AudioControl::outputDevices() const {
     return _engine.outputDevices();
 }
 
+QStringList AudioControl::sampleRates() const {
+    // TODO
+    return {};
+}
+
+QStringList AudioControl::frameBuffers() const {
+    // TODO
+    return {};
+}
+
 void AudioControl::setDriverAPI( int index ) {
     // TODO
 }
@@ -38,6 +50,14 @@ void AudioControl::setInputDevice( int index ) {
 
 void AudioControl::setOutputDevice( int index ) {
     _engine.setOutputDevice( index );
+}
+
+void AudioControl::setSampleRate( int index ) {
+    // TODO
+}
+
+void AudioControl::setFrameBuffer( int index ) {
+    // TODO
 }
 
 void AudioControl::start() {

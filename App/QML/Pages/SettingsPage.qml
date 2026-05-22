@@ -20,7 +20,7 @@ Item {
         spacing: Spacing.spacing4
 
         Text {
-            text: "API Drive"
+            text: "API Drive:"
             color: Colors.textPrimary
             font.pixelSize: Fonts.fontSizeMedium
             font.weight: Font.Bold
@@ -43,7 +43,7 @@ Item {
                 spacing: Spacing.spacing4
 
                 Text {
-                    text: "Input Device"
+                    text: "Input Device:"
                     color: Colors.textPrimary
                     font.pixelSize: Fonts.fontSizeMedium
                     font.weight: Font.Bold
@@ -67,7 +67,7 @@ Item {
                 spacing: Spacing.spacing4
 
                 Text {
-                    text: "Output Device"
+                    text: "Output Device:"
                     color: Colors.textPrimary
                     font.pixelSize: Fonts.fontSizeMedium
                     font.weight: Font.Bold
@@ -79,6 +79,55 @@ Item {
 
                     onCurrentIndexChanged: function () {
                         vAudioControl.setOutputDevice(this.currentIndex)
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Spacing.spacing4
+
+            ColumnLayout {
+                spacing: Spacing.spacing4
+
+                Text {
+                    text: "Sample Rate:"
+                    color: Colors.textPrimary
+                    font.pixelSize: Fonts.fontSizeMedium
+                    font.weight: Font.Bold
+                }
+
+                ComboBoxCustom {
+                    Layout.fillWidth: true
+                    model: vAudioControl.sampleRates
+
+                    onCurrentIndexChanged: function () {
+                        vAudioControl.setSampleRate(this.currentIndex)
+                    }
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            ColumnLayout {
+                spacing: Spacing.spacing4
+
+                Text {
+                    text: "Frame Buffer Size:"
+                    color: Colors.textPrimary
+                    font.pixelSize: Fonts.fontSizeMedium
+                    font.weight: Font.Bold
+                }
+
+                ComboBoxCustom {
+                    Layout.fillWidth: true
+                    model: vAudioControl.frameBuffers
+
+                    onCurrentIndexChanged: function () {
+                        vAudioControl.setFrameBuffer(this.currentIndex)
                     }
                 }
             }
