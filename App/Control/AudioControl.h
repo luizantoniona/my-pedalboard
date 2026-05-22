@@ -7,6 +7,7 @@
 
 class AudioControl : public QObject {
     Q_OBJECT
+    Q_PROPERTY( QStringList driverAPIs READ driverAPIs NOTIFY driverAPIsChanged )
     Q_PROPERTY( QStringList inputDevices READ inputDevices NOTIFY devicesChanged )
     Q_PROPERTY( QStringList outputDevices READ outputDevices NOTIFY devicesChanged )
 
@@ -14,16 +15,20 @@ public:
     AudioControl();
     ~AudioControl();
 
+    QStringList driverAPIs() const;
     QStringList inputDevices() const;
     QStringList outputDevices() const;
 
-    Q_INVOKABLE void setInputDevice( int index );
-    Q_INVOKABLE void setOutputDevice( int index );
+public slots:
+    void setDriverAPI( int index );
+    void setInputDevice( int index );
+    void setOutputDevice( int index );
 
-    Q_INVOKABLE void start();
-    Q_INVOKABLE void stop();
+    void start();
+    void stop();
 
 signals:
+    void driverAPIsChanged();
     void devicesChanged();
 
 private:

@@ -7,10 +7,17 @@ AudioControl::AudioControl() {
 
     _engine.initialize();
     connect( &_engine, &Engine::AudioEngine::devicesChanged, this, &AudioControl::devicesChanged );
+    // TODO
+    // connect( &_engine, &Engine::AudioEngine::driverAPIsChanged, this, &AudioControl::driverAPIsChanged );
 }
 
 AudioControl::~AudioControl() {
     qInfo() << "AudioControl::~AudioControl";
+}
+
+QStringList AudioControl::driverAPIs() const {
+    // TODO
+    return {};
 }
 
 QStringList AudioControl::inputDevices() const {
@@ -19,6 +26,10 @@ QStringList AudioControl::inputDevices() const {
 
 QStringList AudioControl::outputDevices() const {
     return _engine.outputDevices();
+}
+
+void AudioControl::setDriverAPI( int index ) {
+    // TODO
 }
 
 void AudioControl::setInputDevice( int index ) {

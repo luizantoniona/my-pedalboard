@@ -31,7 +31,7 @@ Item {
         Text {
             text: "My Pedalboard"
             color: Colors.textPrimary
-            font.pixelSize: 16
+            font.pixelSize: Fonts.fontSizeMedium
             font.weight: Font.Bold
         }
 

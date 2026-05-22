@@ -60,7 +60,6 @@ Item {
         }
 
         PanelBottom {
-            audioControl: audioControl
             Layout.fillWidth: true
             Layout.preferredHeight: 128
         }
@@ -73,13 +72,17 @@ Item {
     Component {
         id: pageHome
 
-        HomePage {}
+        HomePage {
+            vAudioControl: audioControl
+        }
     }
 
     Component {
         id: pageSettings
 
-        SettingsPage {}
+        SettingsPage {
+            vAudioControl: audioControl
+        }
     }
 
     Component {

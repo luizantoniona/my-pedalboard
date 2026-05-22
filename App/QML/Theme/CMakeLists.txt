@@ -8,6 +8,7 @@ file(GLOB QML_FILES_LIST
 
 set_source_files_properties(
     ${CMAKE_CURRENT_SOURCE_DIR}/Colors.qml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Fonts.qml
     ${CMAKE_CURRENT_SOURCE_DIR}/Icons.qml
     ${CMAKE_CURRENT_SOURCE_DIR}/Spacing.qml
     ${CMAKE_CURRENT_SOURCE_DIR}/Radius.qml

@@ -1,14 +1,11 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Atoms
-import Molecules
+import Control
 import Theme
 
 Item {
     id: root
-
-    property var audioControl
 
     Rectangle {
         id: background
@@ -25,26 +22,8 @@ Item {
         anchors.rightMargin: Spacing.spacing4
         spacing: Spacing.spacing4
 
-        ComboBoxCustom {
-            Layout.fillWidth: true
-            model: audioControl.inputDevices
-
-            onCurrentIndexChanged: function () {
-                audioControl.setInputDevice(this.currentIndex)
-            }
-        }
-
         Item {
             Layout.fillWidth: true
-        }
-
-        ComboBoxCustom {
-            Layout.fillWidth: true
-            model: audioControl.outputDevices
-
-            onCurrentIndexChanged: function () {
-                audioControl.setOutputDevice(this.currentIndex)
-            }
         }
     }
 }
