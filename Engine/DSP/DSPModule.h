@@ -1,15 +1,15 @@
-#ifndef AUDIOEFFECT_H
-#define AUDIOEFFECT_H
+#ifndef DSPMODULE_H
+#define DSPMODULE_H
 
 namespace Engine {
 
-class AudioEffect {
+class DSPModule {
 public:
-    virtual ~AudioEffect() = default;
+    virtual ~DSPModule() = default;
 
     virtual void process( float* left, float* right, unsigned int frames ) = 0;
 };
 
 } // namespace Engine
 
-#endif
+#endif // DSPMODULE_H

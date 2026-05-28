@@ -4,9 +4,9 @@
 
 namespace Engine {
 
-AudioWorker::AudioWorker( QObject* parent ) :
+AudioWorker::AudioWorker( RtAudio::Api driverAPI, QObject* parent ) :
     QObject( parent ),
-    _audio(),
+    _audio( driverAPI ),
     _inputIds(),
     _outputIds(),
     _inputId( 0 ),
@@ -16,6 +16,8 @@ AudioWorker::AudioWorker( QObject* parent ) :
     _isRunning( false ) {
 
     qInfo() << "AudioWorker::AudioWorker";
+
+    // TODO: Load devices info - sample rates - frame buffers
 }
 
 AudioWorker::~AudioWorker() {
@@ -23,6 +25,8 @@ AudioWorker::~AudioWorker() {
 }
 
 void AudioWorker::start() {
+    qInfo() << "AudioWorker::start";
+
     if ( _isRunning ) {
         return;
     }
@@ -38,6 +42,8 @@ void AudioWorker::start() {
 }
 
 void AudioWorker::stop() {
+    qInfo() << "AudioWorker::stop";
+
     if ( !_isRunning ) {
         return;
     }
@@ -48,13 +54,19 @@ void AudioWorker::stop() {
 }
 
 void AudioWorker::requestDevices() {
+    qInfo() << "AudioWorker::requestDevices";
+
     auto inputs = enumerateInputs();
     auto outputs = enumerateOutputs();
 
     emit devicesReady( inputs, outputs );
+
+    qInfo() << "AudioWorker::requestDevices";
 }
 
 void AudioWorker::setInputDevice( int index ) {
+    qInfo() << "AudioWorker::setInputDevice [INDEX]" << index;
+
     if ( index < 0 || index >= _inputIds.size() ) {
         return;
     }
@@ -68,6 +80,8 @@ void AudioWorker::setInputDevice( int index ) {
 }
 
 void AudioWorker::setOutputDevice( int index ) {
+    qInfo() << "AudioWorker::setOutputDevice [INDEX]" << index;
+
     if ( index < 0 || index >= _outputIds.size() ) {
         return;
     }
@@ -207,8 +221,8 @@ void AudioWorker::process( const float* in, float* out, unsigned int nFrames ) {
     for ( unsigned int i = 0; i < nFrames; i++ ) {
         float s = in ? in[ i ] : 0.0f;
 
-        out[ 2 * i ] = s * 5;
-        out[ 2 * i + 1 ] = s * 5;
+        out[ 2 * i ] = s;
+        out[ 2 * i + 1 ] = s;
     }
 }
 

@@ -4,18 +4,18 @@
 #include <memory>
 #include <vector>
 
-#include "AudioEffect.h"
+#include "DSPModule.h"
 
 namespace Engine {
 
 class AudioChain {
 public:
-    void addEffect( std::shared_ptr<AudioEffect> effect );
+    void addModule( std::shared_ptr<DSPModule> modules );
 
     void process( float* left, float* right, unsigned int frames );
 
 private:
-    std::vector<std::shared_ptr<AudioEffect>> _effects;
+    std::vector<std::shared_ptr<DSPModule>> _modules;
 };
 
 } // namespace Engine

@@ -37,6 +37,7 @@ Item {
         spacing: 0
 
         PanelTop {
+            vAudioControl: audioControl
             Layout.fillWidth: true
             Layout.preferredHeight: 64
 
@@ -61,7 +62,6 @@ Item {
         PanelBottom {
             Layout.fillWidth: true
             Layout.preferredHeight: 128
-            audioControl: audioControl
         }
     }
 
@@ -72,13 +72,17 @@ Item {
     Component {
         id: pageHome
 
-        HomePage {}
+        HomePage {
+            vAudioControl: audioControl
+        }
     }
 
     Component {
         id: pageSettings
 
-        SettingsPage {}
+        SettingsPage {
+            vAudioControl: audioControl
+        }
     }
 
     Component {

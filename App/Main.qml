@@ -1,13 +1,15 @@
 import QtQuick
 import QtQuick.Window
-import Application
 
 Window {
     id: window
 
     title: "My Pedalboard"
-    visibility: Window.FullScreen
+    visibility: Window.Windowed
     visible: true
+
+    width: 1024
+    height: 768
 
     ApplicationWindow {
         id: application

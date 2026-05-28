@@ -1,4 +1,4 @@
-#include "AudioEffect.h"
+#include "DSPModule.h"
 
 namespace Engine {
 
