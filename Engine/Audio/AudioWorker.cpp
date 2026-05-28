@@ -4,9 +4,9 @@
 
 namespace Engine {
 
-AudioWorker::AudioWorker( QObject* parent ) :
+AudioWorker::AudioWorker( RtAudio::Api driverAPI, QObject* parent ) :
     QObject( parent ),
-    _audio(),
+    _audio( driverAPI ),
     _inputIds(),
     _outputIds(),
     _inputId( 0 ),
@@ -16,6 +16,8 @@ AudioWorker::AudioWorker( QObject* parent ) :
     _isRunning( false ) {
 
     qInfo() << "AudioWorker::AudioWorker";
+
+    // TODO: Load devices info - sample rates - frame buffers
 }
 
 AudioWorker::~AudioWorker() {

@@ -19,6 +19,10 @@ Item {
         anchors.margins: Spacing.spacing4
         spacing: Spacing.spacing4
 
+        Item {
+            Layout.fillHeight: true
+        }
+
         Text {
             text: "API Drive:"
             color: Colors.textPrimary
@@ -57,10 +61,6 @@ Item {
                         vAudioControl.setInputDevice(this.currentIndex)
                     }
                 }
-            }
-
-            Item {
-                Layout.fillWidth: true
             }
 
             ColumnLayout {
@@ -106,10 +106,6 @@ Item {
                         vAudioControl.setSampleRate(this.currentIndex)
                     }
                 }
-            }
-
-            Item {
-                Layout.fillWidth: true
             }
 
             ColumnLayout {

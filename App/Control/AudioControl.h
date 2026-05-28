@@ -7,21 +7,21 @@
 
 class AudioControl : public QObject {
     Q_OBJECT
-    Q_PROPERTY( QStringList driverAPIs READ driverAPIs NOTIFY driverAPIsChanged )
-    Q_PROPERTY( QStringList inputDevices READ inputDevices NOTIFY devicesChanged )
-    Q_PROPERTY( QStringList outputDevices READ outputDevices NOTIFY devicesChanged )
-    Q_PROPERTY( QStringList sampleRates READ sampleRates NOTIFY sampleRatesChanged )
-    Q_PROPERTY( QStringList frameBuffers READ frameBuffers NOTIFY frameBuffersChanged )
+    Q_PROPERTY( QList<QString> driverAPIs READ driverAPIs NOTIFY driverAPIsChanged )
+    Q_PROPERTY( QList<QString> inputDevices READ inputDevices NOTIFY devicesChanged )
+    Q_PROPERTY( QList<QString> outputDevices READ outputDevices NOTIFY devicesChanged )
+    Q_PROPERTY( QList<QString> sampleRates READ sampleRates NOTIFY sampleRatesChanged )
+    Q_PROPERTY( QList<QString> frameBuffers READ frameBuffers NOTIFY frameBuffersChanged )
 
 public:
-    AudioControl();
+    explicit AudioControl( QObject* parent = nullptr );
     ~AudioControl();
 
-    QStringList driverAPIs() const;
-    QStringList inputDevices() const;
-    QStringList outputDevices() const;
-    QStringList sampleRates() const;
-    QStringList frameBuffers() const;
+    QList<QString> driverAPIs() const;
+    QList<QString> inputDevices() const;
+    QList<QString> outputDevices() const;
+    QList<QString> sampleRates() const;
+    QList<QString> frameBuffers() const;
 
 public slots:
     void setDriverAPI( int index );
