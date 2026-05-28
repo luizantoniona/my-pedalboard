@@ -37,7 +37,7 @@ Item {
         spacing: 0
 
         PanelTop {
-            audioControl: audioControl
+            vAudioControl: audioControl
             Layout.fillWidth: true
             Layout.preferredHeight: 64
 
