@@ -6,11 +6,9 @@ namespace Engine {
 
 AudioEngine::AudioEngine( QObject* parent ) :
     QObject( parent ) {
-    qInfo() << "AudioEngine::AudioEngine";
 }
 
 AudioEngine::~AudioEngine() {
-    qInfo() << "AudioEngine::~AudioEngine";
     _thread.quit();
     _thread.wait();
 }
@@ -52,6 +50,22 @@ void AudioEngine::setInputDevice( int index ) {
 
 void AudioEngine::setOutputDevice( int index ) {
     QMetaObject::invokeMethod( _worker, "setOutputDevice", Qt::QueuedConnection, Q_ARG( int, index ) );
+}
+
+void AudioEngine::addNode( std::string id, std::shared_ptr<AudioNode> node ) {
+    QMetaObject::invokeMethod( _worker, [ worker = _worker, id = std::move( id ), node = std::move( node ) ]() mutable { worker->graph().addNode( id, std::move( node ) ); }, Qt::QueuedConnection );
+}
+
+void AudioEngine::removeNode( std::string id ) {
+    QMetaObject::invokeMethod( _worker, [ worker = _worker, id = std::move( id ) ]() { worker->graph().removeNode( id ); }, Qt::QueuedConnection );
+}
+
+void AudioEngine::connectNodes( std::string fromId, std::string toId ) {
+    QMetaObject::invokeMethod( _worker, [ worker = _worker, fromId = std::move( fromId ), toId = std::move( toId ) ]() { worker->graph().connect( fromId, toId ); }, Qt::QueuedConnection );
+}
+
+void AudioEngine::disconnectNodes( std::string fromId, std::string toId ) {
+    QMetaObject::invokeMethod( _worker, [ worker = _worker, fromId = std::move( fromId ), toId = std::move( toId ) ]() { worker->graph().disconnect( fromId, toId ); }, Qt::QueuedConnection );
 }
 
 } // namespace Engine

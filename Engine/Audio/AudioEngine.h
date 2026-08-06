@@ -1,11 +1,14 @@
-#ifndef AUDIOENGINE_H
-#define AUDIOENGINE_H
+#pragma once
 
 #include <QObject>
 #include <QStringList>
 #include <QThread>
 
+#include <memory>
+#include <string>
+
 #include "AudioWorker.h"
+#include <Engine/DSP/AudioNode.h>
 
 namespace Engine {
 
@@ -25,6 +28,12 @@ public:
     void setInputDevice( int index );
     void setOutputDevice( int index );
 
+    // Graph manipulation — thread-safe, dispatched to Engine thread
+    void addNode( std::string id, std::shared_ptr<AudioNode> node );
+    void removeNode( std::string id );
+    void connectNodes( std::string fromId, std::string toId );
+    void disconnectNodes( std::string fromId, std::string toId );
+
 signals:
     void devicesChanged();
 
@@ -37,5 +46,3 @@ private:
 };
 
 } // namespace Engine
-
-#endif // AUDIOENGINE_H

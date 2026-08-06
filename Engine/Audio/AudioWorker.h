@@ -1,9 +1,11 @@
-#ifndef AUDIOWORKER_H
-#define AUDIOWORKER_H
+#pragma once
 
 #include <QObject>
+#include <QVector>
+#include <vector>
 
-#include <RtAudio.h>
+#include "AudioDevice.h"
+#include "AudioGraph.h"
 
 namespace Engine {
 
@@ -14,18 +16,18 @@ public:
     explicit AudioWorker( QObject* parent = nullptr );
     ~AudioWorker();
 
+    AudioGraph& graph();
+
 public slots:
     void start();
     void stop();
-
     void requestDevices();
     void setInputDevice( int index );
     void setOutputDevice( int index );
+    void setSampleRate( unsigned int sampleRate );
+    void setFrameBuffer( unsigned int frameBuffer );
 
-    void setSampleRate( const unsigned int sampleRate );
     unsigned int sampleRate() const;
-
-    void setFrameBuffer( const unsigned int frameBuffer );
     unsigned int frameBuffer() const;
 
 signals:
@@ -33,32 +35,22 @@ signals:
     void error( QString message );
 
 private:
-    QStringList enumerateInputs();
-    QStringList enumerateOutputs();
+    void process( const float* in, float* out, uint32_t frames );
 
-    void openStream();
-    void closeStream();
-    void restartStream();
-
-    static int callback( void* out, void* in, unsigned int nFrames, double, RtAudioStreamStatus status, void* userData );
-
-    void process( const float* in, float* out, unsigned int nFrames );
-
-private:
-    RtAudio _audio;
+    AudioDevice _device;
+    AudioGraph _graph;
 
     QVector<unsigned int> _inputIds;
     QVector<unsigned int> _outputIds;
 
-    unsigned int _inputId;
-    unsigned int _outputId;
+    unsigned int _inputId{ 0 };
+    unsigned int _outputId{ 0 };
+    unsigned int _sampleRate{ 48000 };
+    unsigned int _frameBuffer{ 256 };
+    bool _isRunning{ false };
 
-    unsigned int _sampleRate;
-    unsigned int _frameBuffer;
-
-    bool _isRunning;
+    std::vector<float> _leftBuf;
+    std::vector<float> _rightBuf;
 };
 
 } // namespace Engine
-
-#endif // AUDIOWORKER_H
