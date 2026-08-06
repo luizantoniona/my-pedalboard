@@ -1,32 +1,26 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(MyPedalboard VERSION 0.1 LANGUAGES CXX)
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{VCPKG_ROOT})
+  file(TO_CMAKE_PATH "$ENV{VCPKG_ROOT}" VCPKG_ROOT_CMAKE)
+  set(CMAKE_TOOLCHAIN_FILE
+      "${VCPKG_ROOT_CMAKE}/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "")
+endif()
+
+project(MyPedalboard LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(MY_PEDALBOARD_BUILD_TESTS "Build tests" ON)
-
-if(DEFINED ENV{VCPKG_ROOT})
-    file(TO_CMAKE_PATH "$ENV{VCPKG_ROOT}" VCPKG_ROOT_CMAKE)
-    set(CMAKE_TOOLCHAIN_FILE
-        "${VCPKG_ROOT_CMAKE}/scripts/buildsystems/vcpkg.cmake"
-        CACHE STRING ""
-    )
-endif()
-
-find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Qml)
-find_package(Qt6 REQUIRED COMPONENTS Quick)
-find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
-find_package(RtAudio CONFIG REQUIRED)
-
-qt_standard_project_setup(REQUIRES 6.8)
+add_subdirectory(GUI)
+list(APPEND QML_IMPORT_PATH "${CMAKE_BINARY_DIR}/GUI/UI")
 
 add_subdirectory(Engine)
+
+add_subdirectory(Models)
+
 add_subdirectory(App)
 
-if(MY_PEDALBOARD_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(Test)
-endif()
+set(QML_IMPORT_PATH
+    "${QML_IMPORT_PATH}"
+    CACHE STRING "QML import paths" FORCE)
