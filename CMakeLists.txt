@@ -13,13 +13,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(GUI)
-list(APPEND QML_IMPORT_PATH "${CMAKE_BINARY_DIR}/GUI/UI")
+list(APPEND QML_IMPORT_PATH "${CMAKE_BINARY_DIR}/GUI/")
 
 add_subdirectory(Engine)
 
 add_subdirectory(Models)
 
 add_subdirectory(App)
+list(APPEND QML_IMPORT_PATH "${CMAKE_BINARY_DIR}/App/")
 
 set(QML_IMPORT_PATH
     "${QML_IMPORT_PATH}"
