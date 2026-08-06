@@ -13,7 +13,7 @@ class AudioWorker : public QObject {
     Q_OBJECT
 
 public:
-    explicit AudioWorker( RtAudio::Api driverAPI, QObject* parent = nullptr );
+    explicit AudioWorker( QObject* parent = nullptr );
     ~AudioWorker();
 
     AudioGraph& graph();
@@ -21,6 +21,7 @@ public:
 public slots:
     void start();
     void stop();
+
     void requestDevices();
     void setInputDevice( int index );
     void setOutputDevice( int index );
@@ -28,13 +29,11 @@ public slots:
     void setFrameBuffer( unsigned int frameBuffer );
 
     unsigned int sampleRate() const;
+
     unsigned int frameBuffer() const;
 
 signals:
     void devicesReady( QStringList inputs, QStringList outputs );
-    void sampleRatesReady( QStringList& sampleRates );
-    void frameBuffersReady( QStringList& frameBuffers );
-
     void error( QString message );
 
 private:
@@ -54,6 +53,7 @@ private:
 
     std::vector<float> _leftBuf;
     std::vector<float> _rightBuf;
+
 };
 
 } // namespace Engine

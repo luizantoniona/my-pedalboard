@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QStringList>
 #include <QThread>
 
 #include <memory>
@@ -18,23 +19,14 @@ public:
     explicit AudioEngine( QObject* parent = nullptr );
     ~AudioEngine();
 
-    QList<QString> driverAPIs() const;
-    QList<QString> inputDevices() const;
-    QList<QString> outputDevices() const;
-    QList<QString> sampleRates() const;
-    QList<QString> frameBuffers() const;
-
-    void setDriverAPI( int index );
-    void setInputDevice( int index );
-    void setOutputDevice( int index );
-    void setSampleRate( int index );
-    void setFrameBuffer( int index );
+    QStringList inputDevices() const;
+    QStringList outputDevices() const;
 
     void initialize();
-    void deinitialize();
-
     void start();
     void stop();
+    void setInputDevice( int index );
+    void setOutputDevice( int index );
 
     // Graph manipulation — thread-safe, dispatched to Engine thread
     void addNode( std::string id, std::shared_ptr<AudioNode> node );
@@ -43,25 +35,14 @@ public:
     void disconnectNodes( std::string fromId, std::string toId );
 
 signals:
-    void driverAPIsChanged();
     void devicesChanged();
-    void sampleRatesChanged();
-    void frameBuffersChanged();
 
 private:
-    AudioWorker* _worker;
+    QThread _thread;
+    AudioWorker* _worker = nullptr;
 
-    QThread _workerThread;
-
-    RtAudio::Api _driverAPI;
-
-    std::vector<RtAudio::Api> _compiledAPIs;
-
-    QList<QString> _driverAPIs;
-    QList<QString> _inputDevices;
-    QList<QString> _outputDevices;
-    QList<QString> _sampleRates;
-    QList<QString> _frameBuffers;
+    QStringList _inputs;
+    QStringList _outputs;
 };
 
 } // namespace Engine

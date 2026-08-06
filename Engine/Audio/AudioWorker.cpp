@@ -4,10 +4,11 @@
 
 namespace Engine {
 
-AudioWorker::AudioWorker( QObject* parent ) : QObject( parent ) {
+AudioWorker::AudioWorker( QObject* parent ) :
+    QObject( parent ) {
     _device.setCallback( [ this ]( const float* in, float* out, uint32_t frames ) {
-        process( in, out, frames );
-    } );
+            process( in, out, frames );
+        } );
 }
 
 AudioWorker::~AudioWorker() = default;
@@ -18,7 +19,9 @@ AudioGraph& AudioWorker::graph() {
 
 void AudioWorker::start() {
     if ( _isRunning )
+
         return;
+
     if ( _inputId == 0 && _outputId == 0 ) {
         emit error( "No device selected" );
         return;
@@ -31,22 +34,30 @@ void AudioWorker::start() {
 
 void AudioWorker::stop() {
     if ( !_isRunning )
+
         return;
     _device.close();
     _isRunning = false;
+
 }
 
 void AudioWorker::requestDevices() {
     auto inputs = _device.enumerateInputs( _inputIds );
     auto outputs = _device.enumerateOutputs( _outputIds );
+
     emit devicesReady( inputs, outputs );
+
 }
 
 void AudioWorker::setInputDevice( int index ) {
     if ( index < 0 || index >= _inputIds.size() )
+
         return;
+
     _inputId = _inputIds[ index ];
+
     if ( _isRunning ) {
+
         stop();
         start();
     }
@@ -54,9 +65,13 @@ void AudioWorker::setInputDevice( int index ) {
 
 void AudioWorker::setOutputDevice( int index ) {
     if ( index < 0 || index >= _outputIds.size() )
+
         return;
+
     _outputId = _outputIds[ index ];
+
     if ( _isRunning ) {
+
         stop();
         start();
     }
@@ -65,7 +80,9 @@ void AudioWorker::setOutputDevice( int index ) {
 void AudioWorker::setSampleRate( unsigned int sampleRate ) {
     if ( sampleRate == _sampleRate )
         return;
+
     _sampleRate = sampleRate;
+
     if ( _isRunning ) {
         stop();
         start();
@@ -79,7 +96,9 @@ unsigned int AudioWorker::sampleRate() const {
 void AudioWorker::setFrameBuffer( unsigned int frameBuffer ) {
     if ( frameBuffer == _frameBuffer )
         return;
+
     _frameBuffer = frameBuffer;
+
     if ( _isRunning ) {
         stop();
         start();
@@ -95,6 +114,7 @@ void AudioWorker::process( const float* in, float* out, uint32_t frames ) {
     for ( uint32_t i = 0; i < frames; i++ ) {
         _leftBuf[ i ] = in ? in[ i ] : 0.0f;
         _rightBuf[ i ] = in ? in[ i ] : 0.0f;
+
     }
 
     AudioBuffer buffer{ _leftBuf.data(), _rightBuf.data(), frames, _sampleRate };
@@ -108,4 +128,3 @@ void AudioWorker::process( const float* in, float* out, uint32_t frames ) {
 }
 
 } // namespace Engine
-
