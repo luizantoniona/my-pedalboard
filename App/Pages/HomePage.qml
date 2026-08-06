@@ -1,11 +1,13 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Organisms
+import Control
 import Theme
 
 Item {
     id: root
+
+    required property AudioControl vAudioControl
 
     Rectangle {
         anchors.fill: parent

@@ -1,9 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
+import Control
+import Atoms
 import Theme
 
 Item {
     id: root
+
+    required property AudioControl vAudioControl
 
     Rectangle {
         anchors.fill: parent
@@ -12,7 +16,118 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: Spacing.spacing0
+        anchors.margins: Spacing.spacing4
+        spacing: Spacing.spacing4
+
+        Item {
+            Layout.fillHeight: true
+        }
+
+        Text {
+            text: "API Drive:"
+            color: Colors.textPrimary
+            font.pixelSize: Fonts.fontSizeMedium
+            font.weight: Font.Bold
+        }
+
+        ComboBoxCustom {
+            Layout.fillWidth: true
+            model: vAudioControl.driverAPIs
+
+            onCurrentIndexChanged: function () {
+                vAudioControl.setDriverAPI(this.currentIndex)
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Spacing.spacing4
+
+            ColumnLayout {
+                spacing: Spacing.spacing4
+
+                Text {
+                    text: "Input Device:"
+                    color: Colors.textPrimary
+                    font.pixelSize: Fonts.fontSizeMedium
+                    font.weight: Font.Bold
+                }
+
+                ComboBoxCustom {
+                    Layout.fillWidth: true
+                    model: vAudioControl.inputDevices
+
+                    onCurrentIndexChanged: function () {
+                        vAudioControl.setInputDevice(this.currentIndex)
+                    }
+                }
+            }
+
+            ColumnLayout {
+                spacing: Spacing.spacing4
+
+                Text {
+                    text: "Output Device:"
+                    color: Colors.textPrimary
+                    font.pixelSize: Fonts.fontSizeMedium
+                    font.weight: Font.Bold
+                }
+
+                ComboBoxCustom {
+                    Layout.fillWidth: true
+                    model: vAudioControl.outputDevices
+
+                    onCurrentIndexChanged: function () {
+                        vAudioControl.setOutputDevice(this.currentIndex)
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Spacing.spacing4
+
+            ColumnLayout {
+                spacing: Spacing.spacing4
+
+                Text {
+                    text: "Sample Rate:"
+                    color: Colors.textPrimary
+                    font.pixelSize: Fonts.fontSizeMedium
+                    font.weight: Font.Bold
+                }
+
+                ComboBoxCustom {
+                    Layout.fillWidth: true
+                    model: vAudioControl.sampleRates
+
+                    onCurrentIndexChanged: function () {
+                        vAudioControl.setSampleRate(this.currentIndex)
+                    }
+                }
+            }
+
+            ColumnLayout {
+                spacing: Spacing.spacing4
+
+                Text {
+                    text: "Frame Buffer Size:"
+                    color: Colors.textPrimary
+                    font.pixelSize: Fonts.fontSizeMedium
+                    font.weight: Font.Bold
+                }
+
+                ComboBoxCustom {
+                    Layout.fillWidth: true
+                    model: vAudioControl.frameBuffers
+
+                    onCurrentIndexChanged: function () {
+                        vAudioControl.setFrameBuffer(this.currentIndex)
+                    }
+                }
+            }
+        }
 
         Item {
             Layout.fillHeight: true

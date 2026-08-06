@@ -13,7 +13,7 @@ class AudioWorker : public QObject {
     Q_OBJECT
 
 public:
-    explicit AudioWorker( QObject* parent = nullptr );
+    explicit AudioWorker( RtAudio::Api driverAPI, QObject* parent = nullptr );
     ~AudioWorker();
 
     AudioGraph& graph();
@@ -32,6 +32,9 @@ public slots:
 
 signals:
     void devicesReady( QStringList inputs, QStringList outputs );
+    void sampleRatesReady( QStringList& sampleRates );
+    void frameBuffersReady( QStringList& frameBuffers );
+
     void error( QString message );
 
 private:

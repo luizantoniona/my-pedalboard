@@ -1,13 +1,14 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Control
 import Atoms
 import Theme
 
 Item {
     id: root
 
-    property var audioControl
+    required property AudioControl vAudioControl
 
     signal homeClicked
     signal aboutClicked
@@ -31,7 +32,7 @@ Item {
         Text {
             text: "My Pedalboard"
             color: Colors.textPrimary
-            font.pixelSize: 16
+            font.pixelSize: Fonts.fontSizeMedium
             font.weight: Font.Bold
         }
 
@@ -42,14 +43,14 @@ Item {
         ButtonIcon {
             vIcon: Icons.iconOutlinedPlayerPlay
             onClicked: function () {
-                audioControl.start()
+                vAudioControl.start()
             }
         }
 
         ButtonIcon {
             vIcon: Icons.iconOutlinedPlayerStop
             onClicked: function () {
-                audioControl.stop()
+                vAudioControl.stop()
             }
         }
 

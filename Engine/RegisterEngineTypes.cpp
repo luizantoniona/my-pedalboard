@@ -1,11 +1,10 @@
 #include "RegisterEngineTypes.h"
 
-// #include <QQmlEngine>
+#include <QObject>
 
-// #include "Audio/AudioEngine.h"
+#include <RtAudio.h>
 
 void RegisterEngineTypes::registerTypes() {
 
-    // Register Audio Engine
-    // qmlRegisterType<AudioEngine>( "Engine", 1, 0, "AudioEngine" );
+    qRegisterMetaType<RtAudio::Api>();
 }

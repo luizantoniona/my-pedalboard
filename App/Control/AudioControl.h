@@ -7,24 +7,37 @@
 
 class AudioControl : public QObject {
     Q_OBJECT
-    Q_PROPERTY( QStringList inputDevices READ inputDevices NOTIFY devicesChanged )
-    Q_PROPERTY( QStringList outputDevices READ outputDevices NOTIFY devicesChanged )
+    Q_PROPERTY( QList<QString> driverAPIs READ driverAPIs NOTIFY driverAPIsChanged )
+    Q_PROPERTY( QList<QString> inputDevices READ inputDevices NOTIFY devicesChanged )
+    Q_PROPERTY( QList<QString> outputDevices READ outputDevices NOTIFY devicesChanged )
+    Q_PROPERTY( QList<QString> sampleRates READ sampleRates NOTIFY sampleRatesChanged )
+    Q_PROPERTY( QList<QString> frameBuffers READ frameBuffers NOTIFY frameBuffersChanged )
 
 public:
-    AudioControl();
+    explicit AudioControl( QObject* parent = nullptr );
     ~AudioControl();
 
-    QStringList inputDevices() const;
-    QStringList outputDevices() const;
+    QList<QString> driverAPIs() const;
+    QList<QString> inputDevices() const;
+    QList<QString> outputDevices() const;
+    QList<QString> sampleRates() const;
+    QList<QString> frameBuffers() const;
 
-    Q_INVOKABLE void setInputDevice( int index );
-    Q_INVOKABLE void setOutputDevice( int index );
+public slots:
+    void setDriverAPI( int index );
+    void setInputDevice( int index );
+    void setOutputDevice( int index );
+    void setSampleRate( int index );
+    void setFrameBuffer( int index );
 
-    Q_INVOKABLE void start();
-    Q_INVOKABLE void stop();
+    void start();
+    void stop();
 
 signals:
+    void driverAPIsChanged();
     void devicesChanged();
+    void sampleRatesChanged();
+    void frameBuffersChanged();
 
 private:
     Engine::AudioEngine _engine;
