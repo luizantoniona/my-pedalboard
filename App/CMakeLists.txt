@@ -2,16 +2,19 @@ cmake_minimum_required(VERSION 3.16)
 
 project(MyPedalboard LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
 set(PROJECT_SOURCES
-    Control/AudioControl.cpp Control/AudioControl.h
-    Control/RegisterControlTypes.cpp Control/RegisterControlTypes.h)
+    AppContext.cpp
+    AppContext.h
+    RegisterAppTypes.cpp
+    RegisterAppTypes.h
+    Application/Home/HomePageControl.cpp
+    Application/Home/HomePageControl.h
+    Application/Settings/SettingsPageControl.cpp
+    Application/Settings/SettingsPageControl.h)
 
 qt_add_executable(${PROJECT_NAME} main.cpp ${PROJECT_SOURCES})
 
@@ -23,24 +26,10 @@ qt_add_qml_module(
   1.0
   QML_FILES
   Main.qml
-  ApplicationWindow.qml
-  Pages/AboutPage.qml
-  Pages/HomePage.qml
-  Pages/SettingsPage.qml)
-
-file(
-  GLOB_RECURSE SVG_FILES
-  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  Assets/*.svg)
-
-qt_add_resources(
-  ${PROJECT_NAME}
-  PREFIX
-  "/Assets"
-  BASE
-  "Assets"
-  FILES
-  ${SVG_FILES})
+  Application/ApplicationWindow.qml
+  Application/About/AboutPage.qml
+  Application/Home/HomePage.qml
+  Application/Settings/SettingsPage.qml)
 
 target_link_libraries(
   ${PROJECT_NAME}
@@ -48,3 +37,6 @@ target_link_libraries(
   PRIVATE MyPedalboard::Engine
   PRIVATE MyPedalboard::Models
   PRIVATE MyPedalboard::GUI)
+
+target_include_directories(
+  ${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>)

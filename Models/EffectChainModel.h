@@ -1,43 +1,53 @@
 #pragma once
 
 #include <QAbstractListModel>
+#include <QList>
 #include <QString>
 
-#include <Engine/Audio/AudioEngine.h>
-#include <Engine/Project/NodeFactory.h>
+namespace Engine {
+class AudioEngine;
+}
+
+namespace Core {
+class NodeRegistry;
+}
 
 namespace Models {
 
-// Maintains the ordered list of effects in the audio graph.
-// Drives AudioEngine graph operations and exposes the chain to QML via ListView.
+// Ordered list of effects in the chain. Drives the graph and exposes the chain
+// to QML; the graph edges are rebuilt from scratch on every structural change.
 class EffectChainModel : public QAbstractListModel {
     Q_OBJECT
     Q_PROPERTY( int count READ rowCount NOTIFY countChanged )
+    Q_PROPERTY( QStringList availableTypes READ availableTypes CONSTANT )
 
 public:
-    enum Roles {
+    enum RoleEnum {
         IdRole = Qt::UserRole + 1,
         TypeNameRole,
         EnabledRole,
     };
 
-    explicit EffectChainModel( Engine::AudioEngine& engine,
-                               Engine::NodeFactory& factory,
-                               QObject* parent = nullptr );
+    explicit EffectChainModel( Engine::AudioEngine& engine, Core::NodeRegistry& registry, QObject* parent = nullptr );
 
-    int rowCount( const QModelIndex& parent = {} ) const override;
+    int rowCount( const QModelIndex& parent = QModelIndex() ) const override;
     QVariant data( const QModelIndex& index, int role ) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+    QStringList availableTypes() const;
+
     Q_INVOKABLE void addEffect( const QString& typeName );
-    Q_INVOKABLE void removeEffect( int index );
+    Q_INVOKABLE void removeEffect( int row );
     Q_INVOKABLE void moveEffect( int from, int to );
+    Q_INVOKABLE void setEffectEnabled( int row, bool enabled );
 
 signals:
     void countChanged();
 
 private:
-    struct Item {
+    class Item {
+
+    public:
         QString id;
         QString typeName;
         bool enabled{ true };
@@ -47,7 +57,7 @@ private:
     QString nextId();
 
     Engine::AudioEngine& _engine;
-    Engine::NodeFactory& _factory;
+    Core::NodeRegistry& _registry;
     QList<Item> _items;
     int _idCounter{ 0 };
 };

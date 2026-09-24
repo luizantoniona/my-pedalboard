@@ -3,11 +3,11 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    readonly property string iconOutlinedHome: "qrc:/icons/outlined/home.svg"
-    readonly property string iconOutlinedInfoCircle: "qrc:/icons/outlined/info-circle.svg"
-    readonly property string iconOutlinedPlayerPlay: "qrc:/icons/outlined/player-play.svg"
-    readonly property string iconOutlinedPlayerStop: "qrc:/icons/outlined/player-stop.svg"
-    readonly property string iconOutlinedPlus: "qrc:/icons/outlined/plus.svg"
-    readonly property string iconOutlinedSettings: "qrc:/icons/outlined/settings.svg"
-    readonly property string iconOutlinedTrash: "qrc:/icons/outlined/trash.svg"
+    readonly property string outlinedHome: "qrc:/Assets/icons/outlined/home.svg"
+    readonly property string outlinedInfoCircle: "qrc:/Assets/icons/outlined/info-circle.svg"
+    readonly property string outlinedPlayerPlay: "qrc:/Assets/icons/outlined/player-play.svg"
+    readonly property string outlinedPlayerStop: "qrc:/Assets/icons/outlined/player-stop.svg"
+    readonly property string outlinedPlus: "qrc:/Assets/icons/outlined/plus.svg"
+    readonly property string outlinedSettings: "qrc:/Assets/icons/outlined/settings.svg"
+    readonly property string outlinedTrash: "qrc:/Assets/icons/outlined/trash.svg"
 }
