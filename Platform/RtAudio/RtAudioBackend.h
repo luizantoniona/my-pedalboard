@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 
 #include <Platform/AudioBackend.h>
@@ -29,9 +30,7 @@ public:
     void close() override;
     bool isOpen() const override;
 
-    std::string lastError() const override {
-        return _lastError;
-    }
+    std::string lastError() const override;
 
 private:
     static int rtCallback( void* output, void* input, unsigned int frames,
@@ -39,10 +38,16 @@ private:
 
     std::vector<AudioDeviceInfo> devices( bool wantInput ) const;
     void selectUsableApi();
+    void attachErrorHandler();
 
     std::unique_ptr<RtAudio> _audio;
     ProcessCallback _callback;
     std::string _lastError;
+
+    // RtAudio may report from the audio thread once the stream is running, so
+    // nothing heavier than an atomic flag may be touched while it is open.
+    std::atomic<bool> _streamOpen{ false };
+    std::atomic<bool> _streamFaulted{ false };
 };
 
 } // namespace Platform
