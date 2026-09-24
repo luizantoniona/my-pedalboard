@@ -1,112 +1,104 @@
 #include <gtest/gtest.h>
 
-#include <cmath>
 #include <memory>
-#include <vector>
-
-#include <QSignalSpy>
 
 #include <Core/DSP/Effect/Utility/Gain.h>
 #include <Core/DSP/EffectNode.h>
-#include <Engine/Audio/AudioWorker.h>
-#include <Platform/Null/NullAudioBackend.h>
+#include <Tests/Support/AudioHarness.h>
+#include <Tests/Support/SignalGenerator.h>
+
+using TestSupport::AudioHarness;
+using TestSupport::SignalGenerator;
 
 namespace {
 
-class WorkerFixture {
-
-public:
-    WorkerFixture() {
-        auto owned = std::make_unique<Platform::NullAudioBackend>();
-        backend = owned.get();
-        worker = std::make_unique<Engine::AudioWorker>( std::move( owned ) );
-        worker->refreshDevices();
-        worker->setFrameBuffer( FRAMES );
-        worker->start();
-    }
-
-    std::vector<float> render( const std::vector<float>& input ) {
-        std::vector<float> output( input.size() * 2, 0.0f );
-        backend->renderBlock( input.data(), output.data(), static_cast<uint32_t>( input.size() ) );
-        return output;
-    }
-
-    static constexpr uint32_t FRAMES = 128;
-
-    Platform::NullAudioBackend* backend{ nullptr };
-    std::unique_ptr<Engine::AudioWorker> worker;
-};
-
-std::vector<float> ramp( uint32_t count ) {
-    std::vector<float> samples( count );
-    for ( uint32_t i = 0; i < count; i++ ) {
-        samples[ i ] = static_cast<float>( i ) / static_cast<float>( count ) - 0.5f;
-    }
-    return samples;
+std::shared_ptr<Core::EffectNode> gainNode( float decibels ) {
+    auto gain = std::make_unique<Core::Gain>();
+    gain->setParameter( "gainDb", decibels );
+    return std::make_shared<Core::EffectNode>( std::move( gain ) );
 }
 
 } // namespace
 
 TEST( AudioWorkerTest, PassesMonoInputToBothOutputChannels ) {
-    WorkerFixture fixture;
+    AudioHarness harness;
 
-    const std::vector<float> input = ramp( WorkerFixture::FRAMES );
-    const std::vector<float> output = fixture.render( input );
+    const std::vector<float> input = SignalGenerator::ramp( 512 );
+    const std::vector<float> output = harness.render( input );
 
     ASSERT_EQ( output.size(), input.size() * 2 );
-    for ( uint32_t i = 0; i < WorkerFixture::FRAMES; i++ ) {
-        EXPECT_FLOAT_EQ( output[ 2 * i ], input[ i ] );
-        EXPECT_FLOAT_EQ( output[ 2 * i + 1 ], input[ i ] );
-    }
+    EXPECT_EQ( harness.leftChannel( output ), input );
+    EXPECT_EQ( harness.rightChannel( output ), input );
 }
 
 TEST( AudioWorkerTest, SilentInputProducesSilentOutput ) {
-    WorkerFixture fixture;
+    AudioHarness harness;
 
-    const std::vector<float> input( WorkerFixture::FRAMES, 0.0f );
-    const std::vector<float> output = fixture.render( input );
+    const std::vector<float> output = harness.render( SignalGenerator::silence( 512 ) );
 
-    for ( float sample : output ) {
-        EXPECT_FLOAT_EQ( sample, 0.0f );
-    }
+    EXPECT_FLOAT_EQ( SignalGenerator::peak( output ), 0.0f );
 }
 
-TEST( AudioWorkerTest, NullInputDoesNotCrash ) {
-    WorkerFixture fixture;
+TEST( AudioWorkerTest, SinePassesThroughUnchanged ) {
+    AudioHarness harness;
 
-    std::vector<float> output( WorkerFixture::FRAMES * 2, 1.0f );
-    fixture.backend->renderBlock( nullptr, output.data(), WorkerFixture::FRAMES );
+    const std::vector<float> input = SignalGenerator::sine( 440.0f, 48000, 1024 );
+    const std::vector<float> output = harness.render( input );
 
-    EXPECT_FLOAT_EQ( output.front(), 0.0f );
+    EXPECT_NEAR( SignalGenerator::rms( harness.leftChannel( output ) ), SignalGenerator::rms( input ), 1.0e-6f );
+}
+
+TEST( AudioWorkerTest, NoiseIsNotAltered ) {
+    AudioHarness harness;
+
+    const std::vector<float> input = SignalGenerator::whiteNoise( 1024, 7 );
+    const std::vector<float> output = harness.render( input );
+
+    EXPECT_EQ( harness.leftChannel( output ), input );
 }
 
 TEST( AudioWorkerTest, EffectInTheGraphChangesTheOutput ) {
-    WorkerFixture fixture;
+    AudioHarness harness;
+    harness.graph().addNode( "gain", gainNode( -6.0f ) );
 
-    auto gain = std::make_unique<Core::Gain>();
-    gain->setParameter( "gainDb", -6.0f );
-    fixture.worker->graph().addNode( "gain", std::make_shared<Core::EffectNode>( std::move( gain ) ) );
+    const std::vector<float> input = SignalGenerator::constant( 1.0f, 128 * 80 );
+    const std::vector<float> output = harness.render( input );
 
-    const std::vector<float> input( WorkerFixture::FRAMES, 1.0f );
-    std::vector<float> output;
-    for ( int block = 0; block < 80; block++ ) {
-        output = fixture.render( input );
-    }
-
-    EXPECT_NEAR( output[ 0 ], 0.5011f, 1.0e-3f );
-    EXPECT_NEAR( output[ 1 ], 0.5011f, 1.0e-3f );
+    EXPECT_NEAR( output.back(), 0.5011f, 1.0e-3f );
 }
 
-TEST( AudioWorkerTest, GrantedBufferLargerThanRequestedDoesNotOverflow ) {
-    WorkerFixture fixture;
+TEST( AudioWorkerTest, ChainedEffectsApplyInOrder ) {
+    AudioHarness harness;
+    harness.graph().addNode( "first", gainNode( -6.0f ) );
+    harness.graph().addNode( "second", gainNode( -6.0f ) );
+    harness.graph().connect( "first", "second" );
 
-    // The driver can hand back more frames than asked for; the callback must
-    // never write past the buffers sized at open time.
-    const std::vector<float> oversized( WorkerFixture::FRAMES * 4, 0.5f );
-    std::vector<float> output( oversized.size() * 2, -1.0f );
+    const std::vector<float> input = SignalGenerator::constant( 1.0f, 128 * 80 );
+    const std::vector<float> output = harness.render( input );
 
-    fixture.backend->renderBlock( oversized.data(), output.data(), static_cast<uint32_t>( oversized.size() ) );
+    EXPECT_NEAR( output.back(), 0.2511f, 1.0e-3f );
+}
 
-    EXPECT_FLOAT_EQ( output[ 0 ], 0.5f );
-    EXPECT_FLOAT_EQ( output.back(), 0.0f );
+// The chain must not depend on how the driver happens to slice the stream.
+TEST( AudioWorkerTest, OutputIsIndependentOfBlockSize ) {
+    const std::vector<float> input = SignalGenerator::sine( 220.0f, 48000, 4096 );
+
+    AudioHarness small( 48000, 64 );
+    AudioHarness large( 48000, 512 );
+
+    const std::vector<float> fromSmall = small.leftChannel( small.render( input ) );
+    const std::vector<float> fromLarge = large.leftChannel( large.render( input ) );
+
+    ASSERT_EQ( fromSmall.size(), fromLarge.size() );
+    for ( std::size_t i = 0; i < fromSmall.size(); i++ ) {
+        EXPECT_FLOAT_EQ( fromSmall[ i ], fromLarge[ i ] ) << "divergiu na amostra " << i;
+    }
+}
+
+TEST( AudioWorkerTest, InputMeterFollowsTheSignal ) {
+    AudioHarness harness;
+
+    harness.render( SignalGenerator::constant( 0.4f, 48000 ) );
+
+    EXPECT_NEAR( harness.waitForInputPeak(), 0.4f, 1.0e-3f );
 }
