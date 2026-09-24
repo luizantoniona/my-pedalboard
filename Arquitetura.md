@@ -30,72 +30,149 @@ Arquitetura — My Pedalboard → DAW
 
 2. Estrutura de Pastas
 
+Esta é a estrutura ALVO, decidida em setembro/2026. Divergências entre ela e o
+disco são débito de migração, não liberdade de escolha.
+
+O corte principal é por PORTABILIDADE, não por funcionalidade. O projeto tem três
+alvos: Windows/Linux desktop, Linux embarcado com Qt em tela (eglfs) e
+microcontrolador Cortex-M4F/M7/H7 com placa de entrada P10 própria. O que roda no
+MCU está em Core/ e Platform/; nada mais.
+
 my-pedalboard/
-├── App/                        # Executável Qt
-│   ├── main.cpp
-│   ├── Main.qml
-│   ├── ApplicationWindow.qml
-│   ├── Assets/
-│   │   └── icons/
-│   └── Pages/
-│       ├── HomePage.qml
-│       ├── SettingsPage.qml
-│       └── AboutPage.qml
 │
-├── Engine/                     # Biblioteca estática, zero Qt GUI
-│   ├── Audio/
-│   │   ├── AudioEngine.h/cpp   # Orquestrador
-│   │   ├── AudioDevice.h/cpp   # Abstração RtAudio
-│   │   ├── AudioWorker.h/cpp   # Executa na audio thread
-│   │   └── AudioGraph.h/cpp    # Grafo de nós
+├── Core/                         # C++20 PORTÁVEL. Zero Qt, zero RtAudio, zero SO.
+│   ├── Analysis/
+│   │   ├── LevelMeter.h/cpp      # peak follower escrito na audio thread
+│   │   ├── NoteHelper.h/cpp      # frequência -> nota MIDI + cents
+│   │   └── PitchDetector.h/cpp   # YIN, roda fora da audio thread
 │   ├── DSP/
-│   │   ├── AudioNode.h         # Classe base do grafo
-│   │   ├── DSPModule.h         # Base dos efeitos
-│   │   ├── Gain.h/cpp
-│   │   ├── Compressor.h/cpp
-│   │   ├── Delay.h/cpp
-│   │   └── ...
-│   ├── MIDI/
-│   │   ├── MidiEngine.h/cpp
-│   │   └── MidiMessage.h
-│   ├── Plugins/
-│   │   ├── PluginManager.h/cpp
-│   │   ├── IPlugin.h           # Interface abstrata
-│   │   └── VST3/CLAP/ (futuro)
+│   │   ├── AudioBuffer.h         # ponteiros + frames + flag mono/estéreo
+│   │   ├── AudioNode.h
+│   │   ├── DSPModule.h           # base dos efeitos, com enabled (bypass)
+│   │   ├── EffectNode.h/cpp
+│   │   └── Effect/
+│   │       ├── Utility/          # Gain
+│   │       ├── Dynamics/         # NoiseGate, Compressor (futuro)
+│   │       ├── Distortion/       # Overdrive, Fuzz (futuro)
+│   │       ├── Filter/           # EQ (futuro)
+│   │       ├── Modulation/       # Chorus, Phaser (futuro)
+│   │       ├── Delay/            # (futuro)
+│   │       ├── Reverb/           # (futuro)
+│   │       └── Amp/              # AmpSim, CabinetIR (futuro)
+│   ├── Graph/
+│   │   └── AudioGraph.h/cpp      # ordem publicada como ponteiro cru + RCU
 │   ├── Project/
-│   │   ├── ProjectManager.h/cpp
-│   │   ├── PresetManager.h/cpp
-│   │   └── Serializer.h/cpp    # JSON
-│   ├── Transport/
-│   │   ├── Transport.h/cpp     # BPM, play/stop/record
-│   │   └── Clock.h/cpp
+│   │   ├── NodeRegistry.h/cpp    # typeName -> instância de DSPModule
+│   │   └── PresetStore.h/cpp     # (futuro)
 │   └── Utils/
-│       ├── RingBuffer.h        # Lock-free para áudio
 │       ├── AtomicValue.h
-│       └── AudioMath.h
+│       ├── AudioMath.h
+│       ├── DenormalGuard.h       # FTZ/DAZ pelo escopo do callback
+│       ├── RingBuffer.h          # SPSC lock-free
+│       └── SmoothedValue.h       # rampa one-pole contra clique
 │
-├── Models/                     # QObject/QAbstractItemModel
-│   ├── AudioDeviceModel.h/cpp
+├── Platform/                     # Backends de I/O. Um por alvo.
+│   ├── AudioBackend.h            # interface; só tipos do Core e STL
+│   ├── AudioDeviceInfo.h
+│   ├── Null/NullAudioBackend     # testes: dirige o grafo sem hardware
+│   ├── RtAudio/RtAudioBackend    # Windows/Linux desktop
+│   ├── Alsa/                     # Linux embarcado (futuro)
+│   └── I2S/                      # MCU (futuro)
+│
+├── Engine/                       # Camada Qt de orquestração.
+│   └── Audio/
+│       ├── AudioEngine.h/cpp     # fachada na UI thread; possui a QThread
+│       └── AudioWorker.h/cpp     # vive na engine thread; backend injetável
+│
+├── Models/                       # QObject / QAbstractListModel
 │   ├── EffectChainModel.h/cpp
-│   ├── PresetModel.h/cpp
-│   └── TransportModel.h/cpp    # (futuro: TrackModel, MixerModel)
+│   ├── LevelModel.h/cpp
+│   └── TunerModel.h/cpp
 │
-├── Control/                    # ViewModels / Controllers
-│   ├── AudioControl.h/cpp
-│   ├── EffectChainControl.h/cpp
-│   ├── SettingsControl.h/cpp
-│   └── RegisterControlTypes.h/cpp
+├── App/                          # Executável. URI MyPedalboardAppComponents.
+│   ├── main.cpp
+│   ├── AppContext.h/cpp          # DONO ÚNICO do engine, models e controls
+│   ├── RegisterAppTypes.h/cpp
+│   ├── Main.qml
+│   └── Application/
+│       ├── ApplicationWindow.qml
+│       ├── About/AboutPage.qml
+│       ├── Home/                 # HomePage.qml + HomePageControl.h/cpp
+│       └── Settings/             # SettingsPage.qml + SettingsPageControl.h/cpp
 │
-├── GUI/                        # Componentes QML reutilizáveis
-│   ├── Atoms/
-│   ├── Molecules/
-│   ├── Organisms/
-│   ├── Templates/
-│   └── Theme/
+├── GUI/                          # URI MyPedalboardGUIComponents.
+│   ├── Assets/icons/
+│   ├── Component/                # subpasta por família
+│   │   ├── Bar/LevelBar.qml
+│   │   ├── Button/ButtonIcon.qml, ButtonText.qml
+│   │   ├── Input/ComboBoxCustom.qml
+│   │   ├── Panel/PanelTop.qml, PanelBottom.qml
+│   │   └── Tuner/TunerDial.qml
+│   └── Theme/                    # Borders, Colors, Fonts, Icons, Radiuses, Spaces
 │
 └── Tests/
-    ├── Engine/
-    └── Models/
+    ├── Core/                     # sem Qt, sem placa de som
+    └── Engine/                   # usa NullAudioBackend
+
+2.1 Decisões que fixam essa estrutura
+
+Core/ é a fronteira de portabilidade. Nenhum arquivo em Core/ pode incluir um
+header de Qt, de RtAudio ou do sistema operacional. Essa é a regra mais rígida do
+projeto: quebrá-la custa o alvo microcontrolador inteiro. Um teste do Core deve
+compilar e passar sem Qt instalado.
+
+Amostra é float32. Os alvos MCU são Cortex-M4F/M7/H7, todos com FPU de precisão
+simples, então o mesmo código de DSP em float roda nos três alvos sem ponto fixo.
+Se algum dia entrar um alvo sem FPU, todo efeito precisa ser reescrito — é a
+premissa que sustenta um Core único.
+
+Heap só no setup. prepare() pode alocar; process() nunca aloca, nunca libera.
+Fora do caminho de áudio, std::vector e std::unordered_map são permitidos no Core.
+O grafo é montado inteiro antes de o stream começar.
+
+Platform/ isola o hardware. IAudioBackend é uma interface pura que fala apenas em
+tipos do Core (sem QStringList, sem RtAudio). Enumeração de device devolve
+std::vector<std::string>; a conversão para tipos Qt acontece no Engine. Trocar de
+alvo é trocar a implementação de backend, sem tocar em Core/ nem em Engine/.
+
+Engine/ é a camada Qt, e só ela orquestra. AudioEngine possui a QThread, o
+AudioWorker e o backend. Não contém DSP.
+
+AppContext é o dono único. O AudioEngine NÃO é singleton. Existe um único
+AudioEngine, criado e possuído pelo AppContext, que é criado no main.cpp logo
+após o QGuiApplication e destruído antes dele. Controls de página recebem
+referências vindas dele; nenhum control possui o engine.
+
+Por que não Singleton: (a) um ponto de acesso global permite que qualquer camada
+chame o Engine, o que anula a regra de dependência da seção 7; (b) testes não
+conseguem injetar um engine falso nem isolar cenários; (c) um unique_ptr estático
+é destruído depois do retorno do main, ou seja, depois do QGuiApplication — e o
+AudioEngine possui uma QThread e um stream RtAudio que precisam ser parados antes
+disso.
+
+Control colocado com a view. Não existe módulo Control/ na raiz. O controller C++
+de uma tela mora na pasta da tela e compila junto do alvo App; o de um componente
+reutilizável mora ao lado do .qml em GUI/Components/. O motivo é proximidade:
+quem edita a tela edita os dois arquivos juntos.
+
+Efeitos agrupados por categoria. Effects/ tem um nível de subpasta por família de
+efeito. A categoria é organização de arquivo apenas: ela não aparece no
+typeName(), no JSON de preset nem na NodeRegistry, que continuam planos.
+
+GUI sem atomic design. A separação Atoms/Molecules/Organisms foi removida.
+GUI/Components/ é uma lista plana; a única distinção que resta é Components
+(elementos visuais) versus Theme (tokens de design). Dois módulos QML, URIs
+"Components" e "Theme".
+
+Sem glob de fontes. Todo .cpp/.h novo entra no PROJECT_SOURCES do CMakeLists do
+seu módulo; todo .qml novo entra no QML_FILES do qt_add_qml_module. Apenas os
+SVGs de App/Assets/ são globados.
+
+Prioridade é desktop. Windows/Linux é o alvo que tem que funcionar primeiro;
+Linux embarcado e MCU vêm depois. Onde uma biblioteca ainda não tem substituto
+portátil — hoje o JSON do Serializer, que usa QJsonDocument — a pendência fica
+registrada como questão em aberto e o desktop segue. O que não se negocia é a
+direção: nada novo entra em Core/ trazendo Qt junto.
 
 3. Engine — Responsabilidades por Módulo
 Audio/
@@ -122,7 +199,7 @@ PluginManager — escaneia, carrega e instancia plugins em background thread
 No futuro: sandboxing por processo
 Project/
 ProjectManager — carrega/salva o projeto completo (JSON)
-PresetManager — gerencia presets por efeito e por patch
+PresetStore — carrega e grava presets por efeito e por patch
 Serializer — serialização/deserialização JSON (usa nlohmann/json ou QJsonDocument)
 Transport/
 Transport — estado de playback (play, stop, record, loop, BPM, posição)
@@ -243,7 +320,7 @@ public:
     // Parâmetros são acessados via AtomicValue<float>
     // para permitir automação thread-safe
     virtual void setParameter(std::string_view name, float value) = 0;
-    virtual float getParameter(std::string_view name) const = 0;
+    virtual float parameter(std::string_view name) const = 0;
 
     virtual std::string_view typeName() const = 0;
 };
@@ -275,7 +352,7 @@ DSPModule
 └── CabinetIR              ← convolução com IR de cabinet
 
 
-Cada efeito expõe parâmetros nomeados via setParameter/getParameter, permitindo que automação e presets sejam completamente agnósticos ao tipo do efeito.
+Cada efeito expõe parâmetros nomeados via setParameter/parameter, permitindo que automação e presets sejam completamente agnósticos ao tipo do efeito.
 
 6. Threading
 
@@ -411,7 +488,7 @@ HomePage.qml
   }
 }
 
-O Serializer reconstrói o grafo consultando uma NodeFactory que mapeia "Overdrive" → new Overdrive(). Adicionar um novo efeito é registrar na factory — sem alterar o serializer.
+O Serializer reconstrói o grafo consultando um NodeRegistry que mapeia "Overdrive" → new Overdrive(). Adicionar um novo efeito é registrar no registry — sem alterar o serializer.
 
 9. Plano de Evolução para DAW
 A arquitetura acima já está preparada. Os pontos de extensão são:
@@ -434,7 +511,7 @@ Com base no código que já existe, as mudanças prioritárias são:
 
 Substituir AudioChain por AudioGraph — a cadeia linear atual vira um caso especial do grafo (lista de nós em série).
 
-Expandir DSPModule com prepare(), reset() e setParameter()/getParameter() para viabilizar presets e automação.
+Expandir DSPModule com prepare(), reset() e setParameter()/parameter() para viabilizar presets e automação.
 
 Criar AudioDevice extraindo a lógica RtAudio de AudioWorker — AudioWorker passa a só orquestrar; AudioDevice abre/fecha o stream.
 
