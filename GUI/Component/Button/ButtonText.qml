@@ -15,8 +15,8 @@ Item {
     property real vWidth: 120
     property real vHeight: 40
 
-    width: vWidth
-    height: vHeight
+    implicitWidth: vWidth
+    implicitHeight: vHeight
 
     Button {
         anchors.fill: parent

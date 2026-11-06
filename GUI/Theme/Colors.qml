@@ -42,6 +42,24 @@ QtObject {
     readonly property color info: "#2196F3"
 
     // ============================================
+    // Pedal Colors
+    // ============================================
+    readonly property color pedalYellow: "#F2C230"
+    readonly property color pedalBlue: "#3E86C8"
+    readonly property color pedalRed: "#C8392B"
+    readonly property color pedalOrange: "#E8702A"
+    readonly property color pedalCyan: "#39B6D6"
+    readonly property color pedalGreen: "#4FA66A"
+    readonly property color pedalPurple: "#8E63C7"
+    readonly property color pedalGray: "#8A8F98"
+    readonly property color pedalPanel: "#121212"
+    readonly property color pedalPanelText: "#161616"
+    readonly property color pedalMetalLight: "#D8D8D8"
+    readonly property color pedalMetalDark: "#7A7A7A"
+    readonly property color ledOn: "#FF3B30"
+    readonly property color ledOff: "#4A1F1C"
+
+    // ============================================
     // Border Colors
     // ============================================
     readonly property color border: "#404040"

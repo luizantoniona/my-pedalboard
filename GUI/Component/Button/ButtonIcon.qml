@@ -15,8 +15,8 @@ Item {
     property real vWidth: 40
     property real vHeight: 40
 
-    width: vWidth
-    height: vHeight
+    implicitWidth: vWidth
+    implicitHeight: vHeight
     visible: vIcon !== ""
 
     Button {

@@ -49,9 +49,12 @@ qt_add_qml_module(
   Component/Bar/LevelBar.qml
   Component/Button/ButtonIcon.qml
   Component/Button/ButtonText.qml
+  Component/Fader/Fader.qml
   Component/Input/ComboBoxCustom.qml
+  Component/Knob/Knob.qml
   Component/Panel/PanelBottom.qml
   Component/Panel/PanelTop.qml
+  Component/Pedal/PedalCard.qml
   Component/Tuner/TunerDial.qml
   Theme/Borders.qml
   Theme/Colors.qml
