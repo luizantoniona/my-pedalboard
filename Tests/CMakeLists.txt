@@ -18,8 +18,19 @@ target_include_directories(
 # Core tests link neither Qt nor RtAudio: if this target ever needs them, the
 # portability boundary has been broken.
 set(CORE_TEST_SOURCES
-    Core/AudioGraphTest.cpp Core/GainTest.cpp Core/PitchDetectorTest.cpp
-    Core/RingBufferTest.cpp Core/SmoothedValueTest.cpp)
+    Core/AudioGraphTest.cpp
+    Core/ChorusTest.cpp
+    Core/DelayTest.cpp
+    Core/EqualizerTest.cpp
+    Core/GainTest.cpp
+    Core/HighGainTest.cpp
+    Core/NoiseGateTest.cpp
+    Core/OverdriveTest.cpp
+    Core/PedalRegistryTest.cpp
+    Core/PitchDetectorTest.cpp
+    Core/ReverbTest.cpp
+    Core/RingBufferTest.cpp
+    Core/SmoothedValueTest.cpp)
 
 add_executable(CoreTests ${CORE_TEST_SOURCES})
 
@@ -35,8 +46,12 @@ gtest_discover_tests(CoreTests)
 # The engine suite brings its own main: the analysis timer that feeds the tuner
 # and the meters only fires while a QCoreApplication is processing events.
 set(ENGINE_TEST_SOURCES
-    Engine/AudioWorkerTest.cpp Engine/TunerIntegrationTest.cpp Engine/main.cpp
-    Support/AudioHarness.cpp Support/AudioHarness.h)
+    Engine/AudioWorkerTest.cpp
+    Engine/EffectChainTest.cpp
+    Engine/TunerIntegrationTest.cpp
+    Engine/main.cpp
+    Support/AudioHarness.cpp
+    Support/AudioHarness.h)
 
 add_executable(EngineTests ${ENGINE_TEST_SOURCES})
 

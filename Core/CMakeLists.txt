@@ -12,14 +12,35 @@ set(PROJECT_SOURCES
     DSP/AudioBuffer.h
     DSP/AudioNode.h
     DSP/DSPModule.h
+    DSP/Effect/Delay/Delay.cpp
+    DSP/Effect/Delay/Delay.h
+    DSP/Effect/Distortion/HighGain.cpp
+    DSP/Effect/Distortion/HighGain.h
+    DSP/Effect/Distortion/Overdrive.cpp
+    DSP/Effect/Distortion/Overdrive.h
+    DSP/Effect/Dynamics/NoiseGate.cpp
+    DSP/Effect/Dynamics/NoiseGate.h
+    DSP/Effect/Filter/Biquad.cpp
+    DSP/Effect/Filter/Biquad.h
+    DSP/Effect/Filter/Equalizer.cpp
+    DSP/Effect/Filter/Equalizer.h
+    DSP/Effect/Modulation/Chorus.cpp
+    DSP/Effect/Modulation/Chorus.h
+    DSP/Effect/Reverb/Reverb.cpp
+    DSP/Effect/Reverb/Reverb.h
     DSP/Effect/Utility/Gain.cpp
     DSP/Effect/Utility/Gain.h
     DSP/EffectNode.cpp
     DSP/EffectNode.h
+    DSP/ParameterInfo.h
     Graph/AudioGraph.cpp
     Graph/AudioGraph.h
     Project/NodeRegistry.cpp
     Project/NodeRegistry.h
+    Project/ParameterOverride.h
+    Project/PedalDefinition.h
+    Project/PedalRegistry.cpp
+    Project/PedalRegistry.h
     Utils/AtomicValue.h
     Utils/AudioMath.h
     Utils/DenormalGuard.h

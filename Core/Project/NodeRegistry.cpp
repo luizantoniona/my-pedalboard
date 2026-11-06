@@ -2,6 +2,13 @@
 
 #include <algorithm>
 
+#include <Core/DSP/Effect/Delay/Delay.h>
+#include <Core/DSP/Effect/Distortion/HighGain.h>
+#include <Core/DSP/Effect/Distortion/Overdrive.h>
+#include <Core/DSP/Effect/Dynamics/NoiseGate.h>
+#include <Core/DSP/Effect/Filter/Equalizer.h>
+#include <Core/DSP/Effect/Modulation/Chorus.h>
+#include <Core/DSP/Effect/Reverb/Reverb.h>
 #include <Core/DSP/Effect/Utility/Gain.h>
 
 namespace Core {
@@ -35,8 +42,29 @@ std::vector<std::string> NodeRegistry::typeNames() const {
 NodeRegistry& NodeRegistry::withBuiltinTypes() {
     static NodeRegistry registry = [] {
         NodeRegistry created;
+        created.registerType( "Chorus", [] {
+            return std::make_unique<Chorus>();
+        } );
+        created.registerType( "Delay", [] {
+            return std::make_unique<Delay>();
+        } );
+        created.registerType( "Equalizer", [] {
+            return std::make_unique<Equalizer>();
+        } );
         created.registerType( "Gain", [] {
             return std::make_unique<Gain>();
+        } );
+        created.registerType( "HighGain", [] {
+            return std::make_unique<HighGain>();
+        } );
+        created.registerType( "NoiseGate", [] {
+            return std::make_unique<NoiseGate>();
+        } );
+        created.registerType( "Overdrive", [] {
+            return std::make_unique<Overdrive>();
+        } );
+        created.registerType( "Reverb", [] {
+            return std::make_unique<Reverb>();
         } );
         return created;
     }();
