@@ -1,9 +1,17 @@
-#ifndef AUDIOWORKER_H
-#define AUDIOWORKER_H
+#pragma once
+
+#include <memory>
+#include <vector>
 
 #include <QObject>
+#include <QStringList>
+#include <QTimer>
 
-#include <RtAudio.h>
+#include <Core/Analysis/LevelMeter.h>
+#include <Core/Analysis/PitchDetector.h>
+#include <Core/Graph/AudioGraph.h>
+#include <Core/Utils/RingBuffer.h>
+#include <Platform/AudioBackend.h>
 
 namespace Engine {
 
@@ -11,57 +19,68 @@ class AudioWorker : public QObject {
     Q_OBJECT
 
 public:
-    explicit AudioWorker( RtAudio::Api driverAPI, QObject* parent = nullptr );
-    ~AudioWorker();
+    explicit AudioWorker( QObject* parent = nullptr );
+    explicit AudioWorker( std::unique_ptr<Platform::AudioBackend> backend, QObject* parent = nullptr );
+    ~AudioWorker() override;
+
+    Core::AudioGraph& graph();
 
 public slots:
+    void initialize();
+    void shutdown();
+
     void start();
     void stop();
 
-    void requestDevices();
+    void refreshDevices();
+
+    void setDriverApi( QString api );
     void setInputDevice( int index );
     void setOutputDevice( int index );
+    void setSampleRate( unsigned int sampleRate );
+    void setFrameBuffer( unsigned int frameBuffer );
 
-    void setSampleRate( const unsigned int sampleRate );
-    unsigned int sampleRate() const;
-
-    void setFrameBuffer( const unsigned int frameBuffer );
-    unsigned int frameBuffer() const;
+    void setTunerEnabled( bool enabled );
 
 signals:
-    void devicesReady( QStringList inputs, QStringList outputs );
-    void sampleRatesReady( QStringList& sampleRates );
-    void frameBuffersReady( QStringList& frameBuffers );
-
-    void error( QString message );
-
-private:
-    QStringList enumerateInputs();
-    QStringList enumerateOutputs();
-
-    void openStream();
-    void closeStream();
-    void restartStream();
-
-    static int callback( void* out, void* in, unsigned int nFrames, double, RtAudioStreamStatus status, void* userData );
-
-    void process( const float* in, float* out, unsigned int nFrames );
+    void apisReady( QStringList apis, QString current );
+    void devicesReady( QStringList inputs, QStringList outputs, QList<int> sampleRates );
+    void streamChanged( bool running, unsigned int sampleRate, unsigned int frameBuffer, double latencyMs );
+    void levelsChanged( float inputPeak, float outputPeak, bool clipping );
+    void pitchChanged( bool voiced, float frequency, int midiNote, float cents );
+    void errorOccurred( QString message );
 
 private:
-    RtAudio _audio;
+    void attachCallback();
+    void process( const float* input, float* output, uint32_t frames );
+    void restartIfRunning();
+    void publishStreamState( bool running );
+    void pollAnalysis();
 
-    QVector<unsigned int> _inputIds;
-    QVector<unsigned int> _outputIds;
+    std::unique_ptr<Platform::AudioBackend> _backend;
+    Core::AudioGraph _graph;
+    Core::LevelMeter _inputMeter;
+    Core::LevelMeter _outputMeter;
+    Core::PitchDetector _pitchDetector;
 
-    unsigned int _inputId;
-    unsigned int _outputId;
+    QTimer* _analysisTimer{ nullptr };
 
-    unsigned int _sampleRate;
-    unsigned int _frameBuffer;
+    std::vector<Platform::AudioDeviceInfo> _inputs;
+    std::vector<Platform::AudioDeviceInfo> _outputs;
 
-    bool _isRunning;
+    std::vector<float> _leftBuffer;
+    std::vector<float> _rightBuffer;
+    std::vector<float> _analysisWindow;
+
+    Core::RingBuffer<float, 8192> _tunerFeed;
+
+    Platform::StreamConfig _requested;
+    Platform::StreamConfig _granted;
+
+    int _inputIndex{ -1 };
+    int _outputIndex{ -1 };
+    bool _running{ false };
+    bool _tunerEnabled{ true };
 };
 
 } // namespace Engine
-
-#endif // AUDIOWORKER_H

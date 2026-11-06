@@ -1,30 +1,30 @@
 #include <QGuiApplication>
-#include <QLocale>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
-#include <QSurfaceFormat>
 
-#include <Control/RegisterControlTypes.h>
-#include <Engine/RegisterEngineTypes.h>
+#include <App/AppContext.h>
+#include <App/RegisterAppTypes.h>
 
 int main( int argc, char* argv[] ) {
+    QCoreApplication::setOrganizationName( QStringLiteral( "MyPedalboard" ) );
+    QCoreApplication::setApplicationName( QStringLiteral( "MyPedalboard" ) );
 
-    QQuickStyle::setStyle( "Basic" );
+    QQuickStyle::setStyle( QStringLiteral( "Basic" ) );
 
     QGuiApplication app( argc, argv );
 
-    QSurfaceFormat format;
-    format.setSamples( 8 );
-    QSurfaceFormat::setDefaultFormat( format );
+    AppContext context;
+    context.initialize();
+
+    RegisterAppTypes::registerTypes( context );
 
     QQmlApplicationEngine engine;
 
-    RegisterControlTypes::registerTypes();
-    RegisterEngineTypes::registerTypes();
+    QObject::connect(
+        &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
+        []() { QCoreApplication::exit( -1 ); }, Qt::QueuedConnection );
 
-    QObject::connect( &engine, &QQmlApplicationEngine::objectCreationFailed, &app, []() { QCoreApplication::exit( -1 ); }, Qt::QueuedConnection );
-
-    engine.loadFromModule( "main", "Main" );
+    engine.loadFromModule( "MyPedalboardAppComponents", "Main" );
 
     return app.exec();
 }

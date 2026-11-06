@@ -1,0 +1,39 @@
+name: Tests
+
+on:
+  push:
+    branches: [develop, main]
+    paths-ignore:
+      - "**/*.md"
+  pull_request:
+    branches: [develop, main]
+    paths-ignore:
+      - "**/*.md"
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+
+      - name: Configure
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+        run: >
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+          -DBUILD_TESTS=ON
+
+      - name: Build tests
+        run: cmake --build build --config Release --target CoreTests EngineTests
+
+      - name: Run tests
+        run: ctest --test-dir build -C Release --output-on-failure

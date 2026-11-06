@@ -2,8 +2,15 @@
 #------------Folders-------------#
 .qtcreator/
 .vs/
-build/
+build*/
 
 #--------------------------------#
 #-------------Files--------------#
 *.txt.user*
+
+#--------------------------------#
+#----------Claude Code-----------#
+CLAUDE.md
+ROADMAP.md
+CHANGELOG.md
+.claude/

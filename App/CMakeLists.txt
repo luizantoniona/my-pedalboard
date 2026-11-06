@@ -1,31 +1,42 @@
-qt_add_executable(MyPedalboard
-    main.cpp
-)
+cmake_minimum_required(VERSION 3.16)
 
-qt_add_qml_module(MyPedalboard
-    URI main
-    VERSION 1.0
-    QML_FILES
-    Main.qml
-    ApplicationWindow.qml
-)
+project(MyPedalboard LANGUAGES CXX)
 
-add_subdirectory(Control)
-add_subdirectory(QML)
+find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2)
 
-file(GLOB_RECURSE SVG_FILES
-    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    Assets/*.svg
-)
+qt_standard_project_setup(REQUIRES 6.8)
 
-qt_add_resources(${PROJECT_NAME}
-    PREFIX "/Assets"
-    BASE "Assets"
-    FILES ${SVG_FILES}
-)
+set(PROJECT_SOURCES
+    AppContext.cpp
+    AppContext.h
+    RegisterAppTypes.cpp
+    RegisterAppTypes.h
+    Application/Home/HomePageControl.cpp
+    Application/Home/HomePageControl.h
+    Application/Settings/SettingsPageControl.cpp
+    Application/Settings/SettingsPageControl.h)
 
-target_link_libraries(MyPedalboard
-    PRIVATE ControlLib
-    PRIVATE Qt6::QuickControls2
-    PRIVATE ${QML_MODULES}
-)
+qt_add_executable(${PROJECT_NAME} main.cpp ${PROJECT_SOURCES})
+
+qt_add_qml_module(
+  ${PROJECT_NAME}
+  URI
+  MyPedalboardAppComponents
+  VERSION
+  1.0
+  QML_FILES
+  Main.qml
+  Application/ApplicationWindow.qml
+  Application/About/AboutPage.qml
+  Application/Home/HomePage.qml
+  Application/Settings/SettingsPage.qml)
+
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE Qt6::QuickControls2
+  PRIVATE MyPedalboard::Engine
+  PRIVATE MyPedalboard::Models
+  PRIVATE MyPedalboard::GUI)
+
+target_include_directories(
+  ${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>)

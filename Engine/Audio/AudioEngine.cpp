@@ -1,149 +1,109 @@
-#include "AudioEngine.h"
+#include <Engine/Audio/AudioEngine.h>
 
-#include <QDebug>
+#include <Engine/Audio/AudioWorker.h>
 
 namespace Engine {
 
 AudioEngine::AudioEngine( QObject* parent ) :
-    QObject( parent ),
-    _worker( nullptr ),
-    _workerThread(),
-    _driverAPI( RtAudio::RTAUDIO_DUMMY ),
-    _compiledAPIs(),
-    _driverAPIs( {} ),
-    _inputDevices( {} ),
-    _outputDevices( {} ),
-    _sampleRates( {} ),
-    _frameBuffers( {} ) {
-
-    qInfo() << "AudioEngine::AudioEngine";
-
-    RtAudio::getCompiledApi( _compiledAPIs );
-
-    // TODO: Should append RtAudio::RTAUDIO_DUMMY as None and in the first position
-
-    for ( const RtAudio::Api api : _compiledAPIs ) {
-        _driverAPIs.append( QString::fromStdString( RtAudio::getApiDisplayName( api ) ) );
-    }
-
-    qInfo() << "AudioEngine::AudioEngine [COMPILED APIS]:" << _driverAPIs;
+    QObject( parent ) {
 }
 
 AudioEngine::~AudioEngine() {
-    qInfo() << "AudioEngine::~AudioEngine";
-    _workerThread.quit();
-    _workerThread.wait();
-    qInfo() << "AudioEngine::~AudioEngine";
-}
-
-QList<QString> AudioEngine::driverAPIs() const {
-    return _driverAPIs;
-}
-
-QList<QString> AudioEngine::inputDevices() const {
-    return _inputDevices;
-}
-
-QList<QString> AudioEngine::outputDevices() const {
-    return _outputDevices;
-}
-
-QList<QString> AudioEngine::sampleRates() const {
-    return _sampleRates;
-}
-
-QList<QString> AudioEngine::frameBuffers() const {
-    return _frameBuffers;
-}
-
-void AudioEngine::setDriverAPI( int index ) {
-    if ( index < 0 || index >= static_cast<int>( _compiledAPIs.size() ) ) {
-        return;
+    if ( _worker != nullptr ) {
+        QMetaObject::invokeMethod( _worker, "shutdown", Qt::BlockingQueuedConnection );
     }
+    _thread.quit();
+    _thread.wait();
 
-    _driverAPI = _compiledAPIs.at( index );
-
-    deinitialize();
-
-    initialize();
-}
-
-void AudioEngine::setInputDevice( int index ) {
-    if ( !_worker ) {
-        return;
-    }
-
-    QMetaObject::invokeMethod( _worker, "setInputDevice", Qt::QueuedConnection, Q_ARG( int, index ) );
-}
-
-void AudioEngine::setOutputDevice( int index ) {
-    if ( !_worker ) {
-        return;
-    }
-
-    QMetaObject::invokeMethod( _worker, "setOutputDevice", Qt::QueuedConnection, Q_ARG( int, index ) );
-}
-
-void AudioEngine::setSampleRate( int index ) {
-    if ( !_worker ) {
-        return;
-    }
-
-    QMetaObject::invokeMethod( _worker, "setSampleRate", Qt::QueuedConnection, Q_ARG( int, index ) );
-}
-
-void AudioEngine::setFrameBuffer( int index ) {
-    if ( !_worker ) {
-        return;
-    }
-
-    QMetaObject::invokeMethod( _worker, "setFrameBuffer", Qt::QueuedConnection, Q_ARG( int, index ) );
+    delete _worker;
+    _worker = nullptr;
 }
 
 void AudioEngine::initialize() {
-    _worker = new AudioWorker( _driverAPI );
-    _worker->moveToThread( &_workerThread );
-
-    QObject::connect( &_workerThread, &QThread::started, _worker, &AudioWorker::requestDevices );
-
-    QObject::connect( _worker, &AudioWorker::devicesReady, this, [ this ]( QStringList inputs, QStringList outputs ) {
-        _inputDevices = inputs;
-        _outputDevices = outputs;
-        emit devicesChanged();
-    } );
-
-    QObject::connect( _worker, &AudioWorker::sampleRatesReady, this, [ this ]( const QStringList& sampleRates ) {
-        _sampleRates = sampleRates;
-        emit sampleRatesChanged();
-    } );
-
-    QObject::connect( _worker, &AudioWorker::frameBuffersReady, this, [ this ]( const QStringList& frameBuffers ) {
-        _frameBuffers = frameBuffers;
-        emit frameBuffersChanged();
-    } );
-
-    _workerThread.start();
-}
-
-void AudioEngine::deinitialize() {
-    if ( !_worker ) {
+    if ( _worker != nullptr ) {
         return;
     }
 
-    QMetaObject::invokeMethod( _worker, "stop", Qt::BlockingQueuedConnection );
+    _worker = new AudioWorker();
+    _worker->moveToThread( &_thread );
 
-    _workerThread.quit();
-    _workerThread.wait();
-    _worker = nullptr;
+    connect( &_thread, &QThread::started, _worker, &AudioWorker::initialize );
 
-    _inputDevices.clear();
-    _outputDevices.clear();
-    _sampleRates.clear();
-    _frameBuffers.clear();
+    connect( _worker, &AudioWorker::apisReady, this, [ this ]( QStringList apis, QString current ) {
+        _driverApis = std::move( apis );
+        _currentDriverApi = std::move( current );
+        emit driverApisChanged();
+    } );
 
-    emit devicesChanged();
-    emit sampleRatesChanged();
-    emit frameBuffersChanged();
+    connect( _worker, &AudioWorker::devicesReady, this, [ this ]( QStringList inputs, QStringList outputs, QList<int> rates ) {
+        _inputs = std::move( inputs );
+        _outputs = std::move( outputs );
+        _sampleRates = std::move( rates );
+        emit devicesChanged();
+        emit sampleRatesChanged();
+    } );
+
+    connect( _worker, &AudioWorker::streamChanged, this, [ this ]( bool running, unsigned int sampleRate, unsigned int frameBuffer, double latency ) {
+        _running = running;
+        _sampleRate = sampleRate;
+        _frameBuffer = frameBuffer;
+        _latencyMs = latency;
+        emit streamStateChanged();
+    } );
+
+    connect( _worker, &AudioWorker::levelsChanged, this, &AudioEngine::levelsChanged );
+    connect( _worker, &AudioWorker::pitchChanged, this, &AudioEngine::pitchChanged );
+    connect( _worker, &AudioWorker::errorOccurred, this, &AudioEngine::errorOccurred );
+
+    _thread.start();
+}
+
+QStringList AudioEngine::driverApis() const {
+    return _driverApis;
+}
+
+QString AudioEngine::currentDriverApi() const {
+    return _currentDriverApi;
+}
+
+QStringList AudioEngine::inputDevices() const {
+    return _inputs;
+}
+
+QStringList AudioEngine::outputDevices() const {
+    return _outputs;
+}
+
+QStringList AudioEngine::sampleRates() const {
+    QStringList values;
+    for ( int rate : _sampleRates ) {
+        values << QString::number( rate );
+    }
+    return values;
+}
+
+QStringList AudioEngine::frameBuffers() const {
+    QStringList values;
+    for ( int frames : _frameBuffers ) {
+        values << QString::number( frames );
+    }
+    return values;
+}
+
+bool AudioEngine::isRunning() const {
+    return _running;
+}
+
+double AudioEngine::latencyMs() const {
+    return _latencyMs;
+}
+
+unsigned int AudioEngine::sampleRate() const {
+    return _sampleRate;
+}
+
+unsigned int AudioEngine::frameBuffer() const {
+    return _frameBuffer;
 }
 
 void AudioEngine::start() {
@@ -152,6 +112,79 @@ void AudioEngine::start() {
 
 void AudioEngine::stop() {
     QMetaObject::invokeMethod( _worker, "stop", Qt::QueuedConnection );
+}
+
+void AudioEngine::setDriverApi( int index ) {
+    if ( index < 0 || index >= _driverApis.size() ) {
+        return;
+    }
+    QMetaObject::invokeMethod( _worker, "setDriverApi", Qt::QueuedConnection, Q_ARG( QString, _driverApis.at( index ) ) );
+}
+
+void AudioEngine::setInputDevice( int index ) {
+    QMetaObject::invokeMethod( _worker, "setInputDevice", Qt::QueuedConnection, Q_ARG( int, index ) );
+}
+
+void AudioEngine::setOutputDevice( int index ) {
+    QMetaObject::invokeMethod( _worker, "setOutputDevice", Qt::QueuedConnection, Q_ARG( int, index ) );
+}
+
+void AudioEngine::setSampleRate( int index ) {
+    if ( index < 0 || index >= _sampleRates.size() ) {
+        return;
+    }
+    QMetaObject::invokeMethod( _worker, "setSampleRate", Qt::QueuedConnection, Q_ARG( unsigned int, static_cast<unsigned int>( _sampleRates.at( index ) ) ) );
+}
+
+void AudioEngine::setFrameBuffer( int index ) {
+    if ( index < 0 || index >= _frameBuffers.size() ) {
+        return;
+    }
+    QMetaObject::invokeMethod( _worker, "setFrameBuffer", Qt::QueuedConnection, Q_ARG( unsigned int, static_cast<unsigned int>( _frameBuffers.at( index ) ) ) );
+}
+
+void AudioEngine::setTunerEnabled( bool enabled ) {
+    QMetaObject::invokeMethod( _worker, "setTunerEnabled", Qt::QueuedConnection, Q_ARG( bool, enabled ) );
+}
+
+void AudioEngine::addNode( std::string id, std::shared_ptr<Core::AudioNode> node ) {
+    QMetaObject::invokeMethod(
+        _worker, [ worker = _worker, id = std::move( id ), node = std::move( node ) ]() mutable {
+            worker->graph().addNode( id, std::move( node ) );
+        },
+        Qt::QueuedConnection );
+}
+
+void AudioEngine::removeNode( std::string id ) {
+    QMetaObject::invokeMethod(
+        _worker, [ worker = _worker, id = std::move( id ) ]() {
+            worker->graph().removeNode( id );
+        },
+        Qt::QueuedConnection );
+}
+
+void AudioEngine::connectNodes( std::string fromId, std::string toId ) {
+    QMetaObject::invokeMethod(
+        _worker, [ worker = _worker, fromId = std::move( fromId ), toId = std::move( toId ) ]() {
+            worker->graph().connect( fromId, toId );
+        },
+        Qt::QueuedConnection );
+}
+
+void AudioEngine::disconnectNodes( std::string fromId, std::string toId ) {
+    QMetaObject::invokeMethod(
+        _worker, [ worker = _worker, fromId = std::move( fromId ), toId = std::move( toId ) ]() {
+            worker->graph().disconnect( fromId, toId );
+        },
+        Qt::QueuedConnection );
+}
+
+void AudioEngine::setChain( std::vector<std::string> orderedIds ) {
+    QMetaObject::invokeMethod(
+        _worker, [ worker = _worker, orderedIds = std::move( orderedIds ) ]() {
+            worker->graph().setSerialChain( orderedIds );
+        },
+        Qt::QueuedConnection );
 }
 
 } // namespace Engine

@@ -1,0 +1,49 @@
+#pragma once
+
+#include <cstdint>
+#include <vector>
+
+namespace Core {
+
+//
+class PitchDetector {
+
+public:
+    class Result {
+
+    public:
+        bool voiced{ false };
+        float frequency{ 0.0f };
+        float clarity{ 0.0f };
+    };
+
+    void prepare( uint32_t sampleRate );
+    Result analyze( const float* samples, uint32_t count );
+
+    uint32_t windowSize() const {
+        return _inputSize;
+    }
+
+private:
+    void decimate( const float* samples );
+    void computeDifference();
+    void computeCumulativeMean();
+    uint32_t absoluteThreshold() const;
+    float parabolicInterpolation( uint32_t tau ) const;
+
+    std::vector<float> _working;
+    std::vector<float> _difference;
+    std::vector<float> _cumulative;
+
+    uint32_t _sampleRate{ 48000 };
+    uint32_t _workingRate{ 12000 };
+    uint32_t _inputSize{ 2048 };
+    uint32_t _decimation{ 4 };
+    uint32_t _tauMin{ 10 };
+    uint32_t _tauMax{ 256 };
+
+    static constexpr float THRESHOLD = 0.15f;
+    static constexpr float SILENCE_RMS = 0.003f;
+};
+
+} // namespace Core

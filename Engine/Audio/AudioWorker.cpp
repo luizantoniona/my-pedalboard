@@ -1,229 +1,320 @@
-#include "AudioWorker.h"
+#include <Engine/Audio/AudioWorker.h>
+
+#include <algorithm>
 
 #include <QDebug>
+#include <QThread>
+
+#include <Core/Analysis/NoteHelper.h>
+#include <Core/Utils/DenormalGuard.h>
+#include <Platform/RtAudio/RtAudioBackend.h>
 
 namespace Engine {
 
-AudioWorker::AudioWorker( RtAudio::Api driverAPI, QObject* parent ) :
-    QObject( parent ),
-    _audio( driverAPI ),
-    _inputIds(),
-    _outputIds(),
-    _inputId( 0 ),
-    _outputId( 0 ),
-    _sampleRate( 48000 ),
-    _frameBuffer( 256 ),
-    _isRunning( false ) {
+namespace {
 
-    qInfo() << "AudioWorker::AudioWorker";
+constexpr int ANALYSIS_INTERVAL_MS = 33;
 
-    // TODO: Load devices info - sample rates - frame buffers
 }
 
-AudioWorker::~AudioWorker() {
-    qInfo() << "AudioWorker::~AudioWorker";
+AudioWorker::AudioWorker( QObject* parent ) :
+    AudioWorker( std::unique_ptr<Platform::AudioBackend>(), parent ) {
+}
+
+AudioWorker::AudioWorker( std::unique_ptr<Platform::AudioBackend> backend, QObject* parent ) :
+    QObject( parent ),
+    _backend( std::move( backend ) ) {
+
+    if ( _backend ) {
+        attachCallback();
+    }
+
+    _analysisTimer = new QTimer( this );
+    _analysisTimer->setInterval( ANALYSIS_INTERVAL_MS );
+    connect( _analysisTimer, &QTimer::timeout, this, &AudioWorker::pollAnalysis );
+}
+
+AudioWorker::~AudioWorker() = default;
+
+Core::AudioGraph& AudioWorker::graph() {
+    return _graph;
+}
+
+void AudioWorker::initialize() {
+    if ( !_backend ) {
+        _backend = std::make_unique<Platform::RtAudioBackend>();
+        attachCallback();
+    }
+
+    QStringList apiNames;
+    for ( const std::string& api : _backend->apis() ) {
+        apiNames << QString::fromStdString( api );
+    }
+    emit apisReady( apiNames, QString::fromStdString( _backend->currentApi() ) );
+
+    refreshDevices();
+    _analysisTimer->start();
+
+    qInfo() << "AudioWorker: API" << QString::fromStdString( _backend->currentApi() )
+            << "- entradas" << _inputs.size() << "- saidas" << _outputs.size();
+}
+
+void AudioWorker::shutdown() {
+    if ( _analysisTimer ) {
+        _analysisTimer->stop();
+    }
+    stop();
+
+    _backend.reset();
+}
+
+void AudioWorker::refreshDevices() {
+    if ( !_backend ) {
+        return;
+    }
+
+    _inputs = _backend->inputDevices();
+    _outputs = _backend->outputDevices();
+
+    QStringList inputNames;
+    for ( const Platform::AudioDeviceInfo& device : _inputs ) {
+        inputNames << QString::fromStdString( device.name );
+    }
+
+    QStringList outputNames;
+    for ( const Platform::AudioDeviceInfo& device : _outputs ) {
+        outputNames << QString::fromStdString( device.name );
+    }
+
+    if ( _inputIndex < 0 && !_inputs.empty() ) {
+        _inputIndex = 0;
+    }
+    if ( _outputIndex < 0 && !_outputs.empty() ) {
+        _outputIndex = 0;
+    }
+
+    QList<int> rates;
+    if ( _outputIndex >= 0 && _outputIndex < static_cast<int>( _outputs.size() ) ) {
+        for ( unsigned int rate : _outputs[ _outputIndex ].sampleRates ) {
+            rates << static_cast<int>( rate );
+        }
+    }
+    if ( rates.isEmpty() ) {
+        rates = { 44100, 48000, 88200, 96000 };
+    }
+
+    emit devicesReady( inputNames, outputNames, rates );
 }
 
 void AudioWorker::start() {
-    qInfo() << "AudioWorker::start";
-
-    if ( _isRunning ) {
+    if ( _running || !_backend ) {
         return;
     }
 
-    if ( _inputId == 0 && _outputId == 0 ) {
-        emit error( "No device selected" );
+    if ( _inputIndex < 0 || _inputIndex >= static_cast<int>( _inputs.size() ) ) {
+        emit errorOccurred( QStringLiteral( "Nenhum dispositivo de entrada selecionado" ) );
+        return;
+    }
+    if ( _outputIndex < 0 || _outputIndex >= static_cast<int>( _outputs.size() ) ) {
+        emit errorOccurred( QStringLiteral( "Nenhum dispositivo de saida selecionado" ) );
         return;
     }
 
-    openStream();
+    _requested.inputDeviceId = _inputs[ _inputIndex ].id;
+    _requested.outputDeviceId = _outputs[ _outputIndex ].id;
 
-    qInfo() << "AudioWorker::start - started";
+    _granted = _backend->open( _requested );
+
+    if ( !_backend->isOpen() ) {
+        const std::string error = _backend->lastError();
+        emit errorOccurred( error.empty()
+                                ? QStringLiteral( "Falha ao abrir o stream de audio" )
+                                : QString::fromStdString( error ) );
+        publishStreamState( false );
+        return;
+    }
+
+    _leftBuffer.assign( _granted.frameBuffer, 0.0f );
+    _rightBuffer.assign( _granted.frameBuffer, 0.0f );
+
+    _graph.prepare( _granted.sampleRate, _granted.frameBuffer );
+    _inputMeter.prepare( _granted.sampleRate );
+    _outputMeter.prepare( _granted.sampleRate );
+    _pitchDetector.prepare( _granted.sampleRate );
+    _analysisWindow.assign( _pitchDetector.windowSize(), 0.0f );
+    _tunerFeed.clear();
+
+    _running = true;
+    publishStreamState( true );
 }
 
 void AudioWorker::stop() {
-    qInfo() << "AudioWorker::stop";
+    if ( !_running || !_backend ) {
+        return;
+    }
+    _running = false;
+    _backend->close();
+    _inputMeter.reset();
+    _outputMeter.reset();
+    publishStreamState( false );
+}
 
-    if ( !_isRunning ) {
+void AudioWorker::setDriverApi( QString api ) {
+    if ( !_backend ) {
         return;
     }
 
-    closeStream();
+    const bool wasRunning = _running;
+    stop();
 
-    qInfo() << "AudioWorker::stop - stopped";
-}
+    if ( !_backend->setApi( api.toStdString() ) ) {
+        emit errorOccurred( QStringLiteral( "API de audio indisponivel: %1" ).arg( api ) );
+        return;
+    }
 
-void AudioWorker::requestDevices() {
-    qInfo() << "AudioWorker::requestDevices";
+    attachCallback();
 
-    auto inputs = enumerateInputs();
-    auto outputs = enumerateOutputs();
+    _inputIndex = -1;
+    _outputIndex = -1;
+    refreshDevices();
 
-    emit devicesReady( inputs, outputs );
-
-    qInfo() << "AudioWorker::requestDevices";
+    if ( wasRunning ) {
+        start();
+    }
 }
 
 void AudioWorker::setInputDevice( int index ) {
-    qInfo() << "AudioWorker::setInputDevice [INDEX]" << index;
-
-    if ( index < 0 || index >= _inputIds.size() ) {
+    if ( index < 0 || index >= static_cast<int>( _inputs.size() ) || index == _inputIndex ) {
         return;
     }
-    _inputId = _inputIds[ index ];
-
-    if ( _isRunning ) {
-        qInfo() << "AudioWorker::setInputDevice - restarting stream with new input device";
-        stop();
-        start();
-    }
+    _inputIndex = index;
+    restartIfRunning();
 }
 
 void AudioWorker::setOutputDevice( int index ) {
-    qInfo() << "AudioWorker::setOutputDevice [INDEX]" << index;
-
-    if ( index < 0 || index >= _outputIds.size() ) {
+    if ( index < 0 || index >= static_cast<int>( _outputs.size() ) || index == _outputIndex ) {
         return;
     }
-    _outputId = _outputIds[ index ];
-
-    if ( _isRunning ) {
-        qInfo() << "AudioWorker::setOutputDevice - restarting stream with new output device";
-        stop();
-        start();
-    }
+    _outputIndex = index;
+    restartIfRunning();
 }
 
 void AudioWorker::setSampleRate( unsigned int sampleRate ) {
-    if ( sampleRate == _sampleRate ) {
+    if ( sampleRate == _requested.sampleRate ) {
         return;
     }
-
-    _sampleRate = sampleRate;
-
-    if ( _isRunning ) {
-        restartStream();
-    }
-}
-
-unsigned int AudioWorker::sampleRate() const {
-    return _sampleRate;
+    _requested.sampleRate = sampleRate;
+    restartIfRunning();
 }
 
 void AudioWorker::setFrameBuffer( unsigned int frameBuffer ) {
-    if ( frameBuffer == _frameBuffer ) {
+    if ( frameBuffer == _requested.frameBuffer ) {
         return;
     }
+    _requested.frameBuffer = frameBuffer;
+    restartIfRunning();
+}
 
-    _frameBuffer = frameBuffer;
-
-    if ( _isRunning ) {
-        restartStream();
+void AudioWorker::setTunerEnabled( bool enabled ) {
+    _tunerEnabled = enabled;
+    if ( !enabled ) {
+        _tunerFeed.clear();
+        emit pitchChanged( false, 0.0f, 0, 0.0f );
     }
 }
 
-unsigned int AudioWorker::frameBuffer() const {
-    return _frameBuffer;
+void AudioWorker::attachCallback() {
+    _backend->setCallback( [ this ]( const float* input, float* output, uint32_t frames ) {
+        process( input, output, frames );
+    } );
 }
 
-QStringList AudioWorker::enumerateInputs() {
-    QStringList list;
-    _inputIds.clear();
-
-    auto ids = _audio.getDeviceIds();
-
-    for ( auto id : ids ) {
-        auto info = _audio.getDeviceInfo( id );
-        if ( info.inputChannels > 0 ) {
-            _inputIds.push_back( id );
-            list << QString::fromStdString( info.name );
-        }
+void AudioWorker::restartIfRunning() {
+    if ( !_running ) {
+        return;
     }
-
-    return list;
-}
-
-QStringList AudioWorker::enumerateOutputs() {
-    QStringList list;
-    _outputIds.clear();
-
-    auto ids = _audio.getDeviceIds();
-
-    for ( auto id : ids ) {
-        auto info = _audio.getDeviceInfo( id );
-        if ( info.outputChannels > 0 ) {
-            _outputIds.push_back( id );
-            list << QString::fromStdString( info.name );
-        }
-    }
-
-    return list;
-}
-
-void AudioWorker::openStream() {
-    closeStream();
-
-    RtAudio::StreamParameters inParams, outParams;
-    unsigned int inputChannels = 0;
-    unsigned int outputChannels = 0;
-
-    if ( _inputId != 0 ) {
-        inParams.deviceId = _inputId;
-        inParams.nChannels = 1;
-        inputChannels = 1;
-    }
-
-    if ( _outputId != 0 ) {
-        outParams.deviceId = _outputId;
-        outParams.nChannels = 2;
-        outputChannels = 2;
-    }
-
-    try {
-        _audio.openStream( _outputId ? &outParams : nullptr, _inputId ? &inParams : nullptr, RTAUDIO_FLOAT32, _sampleRate, &_frameBuffer, &AudioWorker::callback, this );
-        _audio.startStream();
-
-        _isRunning = true;
-
-        qInfo() << "AudioWorker::openStream - started with"
-                << inputChannels << "input channels,"
-                << outputChannels << "output channels,"
-                << _frameBuffer << "frame buffer";
-
-    } catch ( ... ) {
-        emit error( "Failed to open stream" );
-    }
-}
-
-void AudioWorker::closeStream() {
-    if ( _audio.isStreamOpen() ) {
-        _audio.closeStream();
-        _isRunning = false;
-        qInfo() << "AudioWorker::closeStream - stream closed";
-    }
-}
-
-void AudioWorker::restartStream() {
-    qInfo() << "AudioWorker::restartStream";
     stop();
     start();
 }
 
-int AudioWorker::callback( void* out, void* in, unsigned int nFrames, double, RtAudioStreamStatus status, void* userData ) {
-    auto* self = static_cast<AudioWorker*>( userData );
-
-    self->process( static_cast<const float*>( in ), static_cast<float*>( out ), nFrames );
-
-    return 0;
+void AudioWorker::publishStreamState( bool running ) {
+    const double latency = _granted.sampleRate > 0
+                               ? 2000.0 * static_cast<double>( _granted.frameBuffer ) / static_cast<double>( _granted.sampleRate )
+                               : 0.0;
+    emit streamChanged( running, _granted.sampleRate, _granted.frameBuffer, latency );
 }
 
-void AudioWorker::process( const float* in, float* out, unsigned int nFrames ) {
-    for ( unsigned int i = 0; i < nFrames; i++ ) {
-        float s = in ? in[ i ] : 0.0f;
+void AudioWorker::process( const float* input, float* output, uint32_t frames ) {
+    const Core::DenormalGuard denormalGuard;
 
-        out[ 2 * i ] = s;
-        out[ 2 * i + 1 ] = s;
+    const uint32_t safeFrames = std::min<uint32_t>( frames, static_cast<uint32_t>( _leftBuffer.size() ) );
+
+    if ( input != nullptr ) {
+        std::copy_n( input, safeFrames, _leftBuffer.begin() );
+    } else {
+        std::fill_n( _leftBuffer.begin(), safeFrames, 0.0f );
     }
+
+    _inputMeter.process( _leftBuffer.data(), safeFrames );
+
+    if ( _tunerEnabled ) {
+        _tunerFeed.writeBlock( _leftBuffer.data(), safeFrames );
+    }
+
+    Core::AudioBuffer buffer( _leftBuffer.data(), nullptr, safeFrames, _granted.sampleRate );
+    _graph.process( buffer );
+
+    if ( !buffer.isStereo() ) {
+        std::copy_n( _leftBuffer.begin(), safeFrames, _rightBuffer.begin() );
+    }
+
+    _outputMeter.process( _leftBuffer.data(), safeFrames );
+
+    for ( uint32_t i = 0; i < safeFrames; i++ ) {
+        output[ 2 * i ] = _leftBuffer[ i ];
+        output[ 2 * i + 1 ] = _rightBuffer[ i ];
+    }
+
+    for ( uint32_t i = safeFrames; i < frames; i++ ) {
+        output[ 2 * i ] = 0.0f;
+        output[ 2 * i + 1 ] = 0.0f;
+    }
+}
+
+void AudioWorker::pollAnalysis() {
+    if ( !_running ) {
+        return;
+    }
+
+    emit levelsChanged( _inputMeter.peak(), _outputMeter.peak(), _inputMeter.isClipping() );
+
+    if ( !_tunerEnabled || _analysisWindow.empty() ) {
+        return;
+    }
+
+    const std::size_t window = _analysisWindow.size();
+    if ( _tunerFeed.available() < window ) {
+        return;
+    }
+
+    while ( _tunerFeed.available() > window * 2 ) {
+        _tunerFeed.pop();
+    }
+
+    if ( _tunerFeed.readBlock( _analysisWindow.data(), window ) < window ) {
+        return;
+    }
+
+    const Core::PitchDetector::Result result =
+        _pitchDetector.analyze( _analysisWindow.data(), static_cast<uint32_t>( window ) );
+
+    if ( !result.voiced ) {
+        emit pitchChanged( false, 0.0f, 0, 0.0f );
+        return;
+    }
+
+    const Core::NoteInfo note = Core::NoteHelper::fromFrequency( result.frequency );
+    emit pitchChanged( true, result.frequency, note.midiNote, note.cents );
 }
 
 } // namespace Engine
