@@ -33,6 +33,4 @@ if(BUILD_TESTS)
   add_subdirectory(Tests)
 endif()
 
-set(QML_IMPORT_PATH
-    "${QML_IMPORT_PATH}"
-    CACHE STRING "QML import paths" FORCE)
+set(QML_IMPORT_PATH "${QML_IMPORT_PATH}" CACHE STRING "QML import paths" FORCE)
