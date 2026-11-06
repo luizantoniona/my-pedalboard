@@ -1,39 +1,39 @@
-name: Test
+name: Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [develop, main]
+    paths-ignore:
+      - "**/*.md"
+  pull_request:
+    branches: [develop, main]
+    paths-ignore:
+      - "**/*.md"
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  unit-tests:
+    runs-on: windows-2022
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git cmake ninja-build build-essential pkg-config
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
 
-      - name: Bootstrap vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git vcpkg
-          ./vcpkg/bootstrap-vcpkg.sh
+      - name: Configure
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+        run: >
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+          -DBUILD_TESTS=ON
 
-      - name: Install vcpkg dependencies
-        run: |
-          ./vcpkg/vcpkg install --triplet x64-linux rtaudio gtest qt6-base qt6-declarative qt6-quickcontrols2
-
-      - name: Configure CMake
-        run: |
-          cmake -S . -B build -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-            -DCMAKE_BUILD_TYPE=Debug
-
-      - name: Build
-        run: cmake --build build --config Debug
+      - name: Build tests
+        run: cmake --build build --config Release --target CoreTests EngineTests
 
       - name: Run tests
-        run: ctest --test-dir build -C Debug --output-on-failure
+        run: ctest --test-dir build -C Release --output-on-failure
