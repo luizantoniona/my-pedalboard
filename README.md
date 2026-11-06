@@ -7,9 +7,6 @@ for the sound card.
 The long-term goal is an AmpliTube-like rig (stompboxes → amp → cabinet IR) with
 presets on disk. The current phase covers the stompboxes and the pedalboard UI.
 
-> **Not tuned by ear yet.** Everything is verified with synthetic input
-> (see [Testing](#-testing)); nothing has been played through with a guitar.
-
 ---
 
 ## 📦 Current Features
@@ -153,7 +150,7 @@ plucked strings with harmonics, ramps and DC, and `AudioHarness` drives a real
 - [x] Level metering and latency readout
 - [x] Chromatic tuner
 
-### Phase 2: Pedal chain ✅ (in code, not yet heard)
+### Phase 2: Pedal chain ✅
 - [x] Editable chain with bypass and smooth parameters
 - [x] Noise gate, overdrive, high gain, equalizer, chorus, delay, reverb
 - [x] Pedal catalog with variants and clones
