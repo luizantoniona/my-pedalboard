@@ -11,11 +11,6 @@
 
 namespace Core {
 
-// Nodes are mutated from the engine thread and read from the audio thread.
-// The execution order is published as a raw pointer to an immutable vector:
-// the audio thread does one acquire load and walks raw pointers, with no
-// reference counting. std::atomic<std::shared_ptr> is not lock-free on any
-// current implementation, so it cannot be used here.
 class AudioGraph {
 
 public:
@@ -36,11 +31,13 @@ public:
     void removeNode( const std::string& id );
     void connect( const std::string& fromId, const std::string& toId );
     void disconnect( const std::string& fromId, const std::string& toId );
+
+    void setSerialChain( const std::vector<std::string>& orderedIds );
+
     void clear();
 
     void prepare( uint32_t sampleRate, uint32_t maxFrames );
 
-    // Audio thread only
     void process( AudioBuffer& buffer );
 
     const std::unordered_map<std::string, std::shared_ptr<AudioNode>>& nodes() const {

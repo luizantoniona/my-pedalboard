@@ -4,6 +4,14 @@
 
 namespace Core {
 
+namespace {
+
+constexpr ParameterInfo PARAMETERS[] = {
+    ParameterInfo{ "gainDb", "Gain", "dB", -60.0f, 24.0f, 0.0f },
+};
+
+} // namespace
+
 void Gain::prepare( uint32_t sampleRate, uint32_t maxFrames ) {
     _smoothed.prepare( sampleRate );
     _smoothed.snapTo( _gain.load() );
@@ -41,6 +49,10 @@ float Gain::parameter( std::string_view name ) const {
         return AudioMath::linearToDecibel( _gain.load() );
     }
     return 0.0f;
+}
+
+std::span<const ParameterInfo> Gain::parameters() const {
+    return PARAMETERS;
 }
 
 } // namespace Core

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <QList>
 #include <QObject>
@@ -14,10 +15,6 @@ namespace Engine {
 
 class AudioWorker;
 
-// Facade on the UI thread. Owns the engine thread and the worker; every call
-// below is forwarded as a queued invocation. Created and owned by AppContext,
-// never a singleton: it holds a QThread and an audio stream that must be torn
-// down before QGuiApplication goes away.
 class AudioEngine : public QObject {
     Q_OBJECT
 
@@ -53,6 +50,8 @@ public:
     void removeNode( std::string id );
     void connectNodes( std::string fromId, std::string toId );
     void disconnectNodes( std::string fromId, std::string toId );
+
+    void setChain( std::vector<std::string> orderedIds );
 
 signals:
     void driverApisChanged();

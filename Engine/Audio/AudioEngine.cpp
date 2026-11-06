@@ -15,8 +15,6 @@ AudioEngine::~AudioEngine() {
     _thread.quit();
     _thread.wait();
 
-    // Deleted only after the thread is gone: shutdown() already stopped the
-    // analysis timer inside that thread, so no timer is alive to be torn down here.
     delete _worker;
     _worker = nullptr;
 }
@@ -177,6 +175,14 @@ void AudioEngine::disconnectNodes( std::string fromId, std::string toId ) {
     QMetaObject::invokeMethod(
         _worker, [ worker = _worker, fromId = std::move( fromId ), toId = std::move( toId ) ]() {
             worker->graph().disconnect( fromId, toId );
+        },
+        Qt::QueuedConnection );
+}
+
+void AudioEngine::setChain( std::vector<std::string> orderedIds ) {
+    QMetaObject::invokeMethod(
+        _worker, [ worker = _worker, orderedIds = std::move( orderedIds ) ]() {
+            worker->graph().setSerialChain( orderedIds );
         },
         Qt::QueuedConnection );
 }

@@ -46,6 +46,23 @@ void AudioGraph::disconnect( const std::string& fromId, const std::string& toId 
     rebuildExecutionOrder();
 }
 
+void AudioGraph::setSerialChain( const std::vector<std::string>& orderedIds ) {
+    _edges.clear();
+
+    const std::string* previous = nullptr;
+    for ( const std::string& id : orderedIds ) {
+        if ( _nodes.count( id ) == 0 ) {
+            continue;
+        }
+        if ( previous != nullptr ) {
+            _edges.push_back( Edge{ *previous, id } );
+        }
+        previous = &id;
+    }
+
+    rebuildExecutionOrder();
+}
+
 void AudioGraph::clear() {
     _nodes.clear();
     _edges.clear();
@@ -83,9 +100,6 @@ void AudioGraph::rebuildExecutionOrder() {
     }
 }
 
-// A retired list can only be freed once the audio thread has certainly left it.
-// One completed process() after the swap is not enough: the thread may have
-// loaded the old pointer just before the swap. Two are.
 void AudioGraph::collectGarbage() {
     const uint64_t current = _processGeneration.load( std::memory_order_acquire );
     std::erase_if( _retired, [ current ]( const RetiredList& retired ) {
@@ -93,7 +107,6 @@ void AudioGraph::collectGarbage() {
     } );
 }
 
-// Kahn
 AudioGraph::NodeList AudioGraph::topologicalSort() const {
     std::unordered_map<std::string, int> inDegree;
     inDegree.reserve( _nodes.size() );

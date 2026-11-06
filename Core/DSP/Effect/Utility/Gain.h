@@ -16,12 +16,13 @@ public:
     void setParameter( std::string_view name, float value ) override;
     float parameter( std::string_view name ) const override;
 
+    std::span<const ParameterInfo> parameters() const override;
+
     std::string_view typeName() const override {
         return "Gain";
     }
 
 private:
-    // Linear scale; exposed as the "gainDb" parameter
     AtomicValue<float> _gain{ 1.0f };
     SmoothedValue _smoothed;
 };

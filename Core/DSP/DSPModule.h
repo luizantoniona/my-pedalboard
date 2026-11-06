@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <span>
 #include <string_view>
 
+#include <Core/DSP/ParameterInfo.h>
 #include <Core/Utils/AtomicValue.h>
 
 namespace Core {
@@ -12,10 +14,8 @@ class DSPModule {
 public:
     virtual ~DSPModule() = default;
 
-    // Audio thread only — never allocate memory here
     virtual void process( float* left, float* right, uint32_t frames ) = 0;
 
-    // Called outside the audio thread (setup / sample-rate change)
     virtual void prepare( uint32_t sampleRate, uint32_t maxFrames ) {
     }
 
@@ -27,6 +27,10 @@ public:
 
     virtual float parameter( std::string_view name ) const {
         return 0.0f;
+    }
+
+    virtual std::span<const ParameterInfo> parameters() const {
+        return {};
     }
 
     virtual std::string_view typeName() const = 0;
