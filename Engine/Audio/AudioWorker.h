@@ -15,8 +15,6 @@
 
 namespace Engine {
 
-// Lives on the engine thread. Owns the backend and the graph, and is the only
-// object the audio callback touches.
 class AudioWorker : public QObject {
     Q_OBJECT
 
@@ -53,6 +51,7 @@ signals:
     void errorOccurred( QString message );
 
 private:
+    void attachCallback();
     void process( const float* input, float* output, uint32_t frames );
     void restartIfRunning();
     void publishStreamState( bool running );

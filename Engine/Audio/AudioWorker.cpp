@@ -18,16 +18,16 @@ constexpr int ANALYSIS_INTERVAL_MS = 33;
 }
 
 AudioWorker::AudioWorker( QObject* parent ) :
-    AudioWorker( std::make_unique<Platform::RtAudioBackend>(), parent ) {
+    AudioWorker( std::unique_ptr<Platform::AudioBackend>(), parent ) {
 }
 
 AudioWorker::AudioWorker( std::unique_ptr<Platform::AudioBackend> backend, QObject* parent ) :
     QObject( parent ),
     _backend( std::move( backend ) ) {
 
-    _backend->setCallback( [ this ]( const float* input, float* output, uint32_t frames ) {
-        process( input, output, frames );
-    } );
+    if ( _backend ) {
+        attachCallback();
+    }
 
     _analysisTimer = new QTimer( this );
     _analysisTimer->setInterval( ANALYSIS_INTERVAL_MS );
@@ -41,6 +41,11 @@ Core::AudioGraph& AudioWorker::graph() {
 }
 
 void AudioWorker::initialize() {
+    if ( !_backend ) {
+        _backend = std::make_unique<Platform::RtAudioBackend>();
+        attachCallback();
+    }
+
     QStringList apiNames;
     for ( const std::string& api : _backend->apis() ) {
         apiNames << QString::fromStdString( api );
@@ -59,9 +64,15 @@ void AudioWorker::shutdown() {
         _analysisTimer->stop();
     }
     stop();
+
+    _backend.reset();
 }
 
 void AudioWorker::refreshDevices() {
+    if ( !_backend ) {
+        return;
+    }
+
     _inputs = _backend->inputDevices();
     _outputs = _backend->outputDevices();
 
@@ -96,7 +107,7 @@ void AudioWorker::refreshDevices() {
 }
 
 void AudioWorker::start() {
-    if ( _running ) {
+    if ( _running || !_backend ) {
         return;
     }
 
@@ -123,7 +134,6 @@ void AudioWorker::start() {
         return;
     }
 
-    // Sized from the granted frame count, never the requested one
     _leftBuffer.assign( _granted.frameBuffer, 0.0f );
     _rightBuffer.assign( _granted.frameBuffer, 0.0f );
 
@@ -139,7 +149,7 @@ void AudioWorker::start() {
 }
 
 void AudioWorker::stop() {
-    if ( !_running ) {
+    if ( !_running || !_backend ) {
         return;
     }
     _running = false;
@@ -150,6 +160,10 @@ void AudioWorker::stop() {
 }
 
 void AudioWorker::setDriverApi( QString api ) {
+    if ( !_backend ) {
+        return;
+    }
+
     const bool wasRunning = _running;
     stop();
 
@@ -158,9 +172,7 @@ void AudioWorker::setDriverApi( QString api ) {
         return;
     }
 
-    _backend->setCallback( [ this ]( const float* input, float* output, uint32_t frames ) {
-        process( input, output, frames );
-    } );
+    attachCallback();
 
     _inputIndex = -1;
     _outputIndex = -1;
@@ -211,6 +223,12 @@ void AudioWorker::setTunerEnabled( bool enabled ) {
     }
 }
 
+void AudioWorker::attachCallback() {
+    _backend->setCallback( [ this ]( const float* input, float* output, uint32_t frames ) {
+        process( input, output, frames );
+    } );
+}
+
 void AudioWorker::restartIfRunning() {
     if ( !_running ) {
         return;
@@ -243,7 +261,6 @@ void AudioWorker::process( const float* input, float* output, uint32_t frames ) 
         _tunerFeed.writeBlock( _leftBuffer.data(), safeFrames );
     }
 
-    // The signal stays mono through the chain; a later stage opens it to stereo
     Core::AudioBuffer buffer( _leftBuffer.data(), nullptr, safeFrames, _granted.sampleRate );
     _graph.process( buffer );
 
@@ -280,7 +297,6 @@ void AudioWorker::pollAnalysis() {
         return;
     }
 
-    // Keep only the freshest window so the reading tracks the note being played
     while ( _tunerFeed.available() > window * 2 ) {
         _tunerFeed.pop();
     }
