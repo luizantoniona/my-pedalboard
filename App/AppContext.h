@@ -11,9 +11,6 @@
 #include <Models/LevelModel.h>
 #include <Models/TunerModel.h>
 
-// Single owner of the engine, the models and the page controls. Created on the
-// stack in main() right after QGuiApplication and destroyed before it, so the
-// audio stream and the engine thread are torn down while Qt is still alive.
 class AppContext : public QObject {
     Q_OBJECT
     Q_PROPERTY( HomePageControl* home READ home CONSTANT )

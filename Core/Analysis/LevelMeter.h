@@ -6,8 +6,6 @@
 
 namespace Core {
 
-// Peak follower written on the audio thread, read by the UI.
-// Decay is applied per block so a released note falls smoothly.
 class LevelMeter {
 
 public:

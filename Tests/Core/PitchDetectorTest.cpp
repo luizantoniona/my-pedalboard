@@ -38,8 +38,6 @@ TEST( PitchDetectorTest, DetectsA440 ) {
     EXPECT_NEAR( result.frequency, 440.0f, 6.0f );
 }
 
-// A harmonic-rich signal is where a detector typically locks onto the second
-// partial and reports the note an octave high.
 TEST( PitchDetectorTest, DoesNotJumpAnOctaveOnAHarmonicRichSignal ) {
     const Core::PitchDetector::Result result = analyze( SignalGenerator::pluckedString( 110.0f, 48000, windowSize() ) );
 

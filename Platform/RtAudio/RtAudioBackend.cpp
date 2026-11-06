@@ -13,11 +13,6 @@ namespace {
 void discardProbeReport( RtAudioErrorType, const std::string& ) {
 }
 
-// RtAudio probes every registered driver inside its constructor and only
-// attaches the error callback afterwards, so those reports reach std::cerr no
-// matter what is passed in. An ASIO driver installed with its interface
-// unplugged fails to load and prints one line per attempt; the device just does
-// not show up in the list, which is the whole of what it means.
 class SilencedStandardError {
 
 public:
@@ -80,8 +75,6 @@ bool RtAudioBackend::setApi( const std::string& api ) {
         }
         close();
 
-        // Only one ASIO driver can be loaded per process, so the current object
-        // has to let go of it before the replacement tries to claim it.
         _audio.reset();
         _audio = makeDevice( candidate );
         attachErrorHandler();
@@ -143,9 +136,6 @@ StreamConfig RtAudioBackend::open( const StreamConfig& requested ) {
     RtAudio::StreamOptions options;
     options.flags = RTAUDIO_MINIMIZE_LATENCY;
 
-    // RtAudio writes the frame count it actually granted back into this
-    // variable. Discarding it sizes the working buffers too small and the
-    // callback then writes past their end — ASIO routinely imposes its own.
     unsigned int frames = requested.frameBuffer;
 
     const RtAudioErrorType status = _audio->openStream(
@@ -207,9 +197,6 @@ int RtAudioBackend::rtCallback( void* output, void* input, unsigned int frames,
     return 0;
 }
 
-// The default API can be one with no hardware attached: an installed ASIO
-// driver whose interface is unplugged enumerates nothing. Fall back to the
-// first compiled API that reports both an input and an output.
 void RtAudioBackend::selectUsableApi() {
     if ( !inputDevices().empty() && !outputDevices().empty() ) {
         return;
@@ -225,8 +212,6 @@ void RtAudioBackend::selectUsableApi() {
             continue;
         }
 
-        // Released before the candidate is built: ASIO allows one loaded
-        // driver per process, so the two cannot overlap.
         _audio.reset();
         _audio = makeDevice( candidate );
         attachErrorHandler();
@@ -241,9 +226,6 @@ void RtAudioBackend::selectUsableApi() {
     attachErrorHandler();
 }
 
-// Without a handler RtAudio writes straight to stderr. Probing an ASIO driver
-// whose interface is unplugged fails and is reported as a warning: it is noise,
-// not a fault, and the device simply does not appear in the list.
 void RtAudioBackend::attachErrorHandler() {
     _audio->setErrorCallback( [ this ]( RtAudioErrorType type, const std::string& text ) {
         if ( type == RTAUDIO_WARNING ) {

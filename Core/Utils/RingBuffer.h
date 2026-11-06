@@ -7,8 +7,6 @@
 
 namespace Core {
 
-// Single-producer single-consumer lock-free ring buffer.
-// Safe between exactly two threads: audio thread writes, one reader drains.
 template <typename T, std::size_t Capacity>
 class RingBuffer {
     static_assert( ( Capacity & ( Capacity - 1 ) ) == 0, "Capacity must be a power of two" );
@@ -38,8 +36,6 @@ public:
         return value;
     }
 
-    // Writes as many values as fit, dropping the remainder. The audio thread
-    // must never stall waiting for a slow reader.
     std::size_t writeBlock( const T* values, std::size_t count ) {
         std::size_t written = 0;
         while ( written < count && push( values[ written ] ) ) {

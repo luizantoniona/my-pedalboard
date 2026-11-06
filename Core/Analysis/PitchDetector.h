@@ -5,12 +5,7 @@
 
 namespace Core {
 
-// YIN pitch detection. Runs outside the audio thread — the audio thread only
-// pushes samples into a RingBuffer, a timer drains them and calls analyze().
 //
-// Input is decimated to roughly 12 kHz before analysis: a guitar fundamental
-// never exceeds ~1.3 kHz, and the decimation cuts the cost of the difference
-// function by the square of the factor.
 class PitchDetector {
 
 public:
@@ -25,7 +20,6 @@ public:
     void prepare( uint32_t sampleRate );
     Result analyze( const float* samples, uint32_t count );
 
-    // Number of input samples analyze() expects
     uint32_t windowSize() const {
         return _inputSize;
     }

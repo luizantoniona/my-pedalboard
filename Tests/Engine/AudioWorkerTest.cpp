@@ -79,7 +79,6 @@ TEST( AudioWorkerTest, ChainedEffectsApplyInOrder ) {
     EXPECT_NEAR( output.back(), 0.2511f, 1.0e-3f );
 }
 
-// The chain must not depend on how the driver happens to slice the stream.
 TEST( AudioWorkerTest, OutputIsIndependentOfBlockSize ) {
     const std::vector<float> input = SignalGenerator::sine( 220.0f, 48000, 4096 );
 

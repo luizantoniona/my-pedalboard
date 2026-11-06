@@ -11,10 +11,8 @@ class AudioNode {
 public:
     virtual ~AudioNode() = default;
 
-    // Audio thread only — never allocate, lock or block here
     virtual void process( AudioBuffer& buffer ) = 0;
 
-    // Called outside the audio thread
     virtual void prepare( uint32_t sampleRate, uint32_t maxFrames ) {
     }
 

@@ -18,9 +18,6 @@ public:
     unsigned int frameBuffer{ 128 };
 };
 
-// One implementation per target: RtAudio on desktop, ALSA on embedded Linux,
-// I2S/DMA on the microcontroller. Speaks only in Core and STL types so that
-// nothing above it depends on the audio API in use.
 class AudioBackend {
 
 public:
@@ -37,8 +34,6 @@ public:
 
     virtual void setCallback( ProcessCallback callback ) = 0;
 
-    // Returns the config actually granted by the driver, which may differ from
-    // the one requested — ASIO commonly imposes its own frame buffer.
     virtual StreamConfig open( const StreamConfig& requested ) = 0;
     virtual void close() = 0;
     virtual bool isOpen() const = 0;

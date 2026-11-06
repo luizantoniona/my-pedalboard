@@ -11,9 +11,6 @@
 
 namespace TestSupport {
 
-// Drives a real AudioWorker through the Null backend: no sound card, no engine
-// thread. Blocks are pushed synchronously, so a test controls exactly how much
-// audio the pipeline has seen before it asserts.
 class AudioHarness {
 
 public:
@@ -32,14 +29,11 @@ public:
     Engine::AudioWorker& worker();
     Core::AudioGraph& graph();
 
-    // Feeds the signal one frameBuffer at a time and returns the interleaved
-    // stereo output of every block concatenated.
     std::vector<float> render( const std::vector<float>& input );
 
     std::vector<float> leftChannel( const std::vector<float>& interleaved ) const;
     std::vector<float> rightChannel( const std::vector<float>& interleaved ) const;
 
-    // Runs the event loop until the analysis timer publishes a reading
     Reading waitForPitch( int timeoutMs = 2000 );
     float waitForInputPeak( int timeoutMs = 2000 );
 

@@ -9,8 +9,6 @@ class RtAudio;
 
 namespace Platform {
 
-// RtAudio is held behind a pointer so that <RtAudio.h> does not leak into
-// every translation unit that reaches the engine.
 class RtAudioBackend : public AudioBackend {
 
 public:
@@ -44,8 +42,6 @@ private:
     ProcessCallback _callback;
     std::string _lastError;
 
-    // RtAudio may report from the audio thread once the stream is running, so
-    // nothing heavier than an atomic flag may be touched while it is open.
     std::atomic<bool> _streamOpen{ false };
     std::atomic<bool> _streamFaulted{ false };
 };

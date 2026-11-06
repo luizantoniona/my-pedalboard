@@ -10,8 +10,6 @@
 
 namespace Core {
 
-// Maps type name strings ("Gain") to DSPModule constructors. Flat by design:
-// the folder a effect lives in never appears here, in typeName(), or in a preset.
 class NodeRegistry {
 
 public:

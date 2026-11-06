@@ -8,8 +8,6 @@
 
 namespace Core {
 
-// Flush-to-zero / denormals-are-zero for the scope of an audio callback.
-// Denormals in feedback tails (delay, reverb) cost up to 100x on x86.
 class DenormalGuard {
 
 public:

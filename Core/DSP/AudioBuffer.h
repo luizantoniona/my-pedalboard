@@ -31,7 +31,6 @@ public:
         return _sampleRate;
     }
 
-    // A guitar source is mono until a stage opens it into stereo
     bool isStereo() const {
         return _stereo;
     }

@@ -5,8 +5,6 @@
 
 namespace Core {
 
-// One-pole ramp for parameters that multiply the signal. Stepping a gain or a
-// mix straight to its new value clicks; this spreads the change over a few ms.
 class SmoothedValue {
 
 public:

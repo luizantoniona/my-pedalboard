@@ -4,8 +4,6 @@
 
 namespace Platform {
 
-// Backend with no hardware behind it: the graph can be driven block by block
-// from a test. Keeps DSP testable without a sound card and without Qt.
 class NullAudioBackend : public AudioBackend {
 
 public:
@@ -26,7 +24,6 @@ public:
         return {};
     }
 
-    // Drives one block through the registered callback
     void renderBlock( const float* input, float* output, uint32_t frames );
 
 private:

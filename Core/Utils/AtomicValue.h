@@ -4,9 +4,6 @@
 
 namespace Core {
 
-// Parameter shared between the UI thread (write) and the audio thread (read).
-// Uses relaxed ordering — suitable for continuously-updated float parameters (gain, freq, etc.)
-// where occasional stale reads are acceptable.
 template <typename T>
 class AtomicValue {
 public:
