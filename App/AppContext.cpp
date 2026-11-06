@@ -1,6 +1,6 @@
 #include <App/AppContext.h>
 
-#include <Core/Project/NodeRegistry.h>
+#include <Core/Project/PedalRegistry.h>
 
 AppContext::AppContext( QObject* parent ) :
     QObject( parent ) {
@@ -13,7 +13,7 @@ void AppContext::initialize() {
 
     _tuner = std::make_unique<Models::TunerModel>( _engine );
     _levels = std::make_unique<Models::LevelModel>( _engine );
-    _chain = std::make_unique<Models::EffectChainModel>( _engine, Core::NodeRegistry::withBuiltinTypes() );
+    _chain = std::make_unique<Models::EffectChainModel>( _engine, Core::PedalRegistry::withBuiltinPedals() );
     _home = std::make_unique<HomePageControl>( _engine );
     _settings = std::make_unique<SettingsPageControl>( _engine );
 }
